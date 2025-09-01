@@ -171,7 +171,9 @@ export function getCookieTypeConfig(type: CookieType): CookieTypeConfig {
 }
 
 // Función para verificar si una funcionalidad está habilitada
-export function isFeatureEnabled(feature: keyof typeof COOKIE_CONFIG): boolean {
+type FeatureKey = 'GOOGLE_ANALYTICS' | 'GDPR' | 'CCPA';
+
+export function isFeatureEnabled(feature: FeatureKey): boolean {
   switch (feature) {
     case 'GOOGLE_ANALYTICS':
       return COOKIE_CONFIG.GOOGLE_ANALYTICS.ENABLED;
@@ -187,13 +189,13 @@ export function isFeatureEnabled(feature: keyof typeof COOKIE_CONFIG): boolean {
 // Función para obtener la duración de una cookie
 export function getCookieDuration(type: CookieType): number | string {
   switch (type) {
-    case 'analytics':
+    case 'ANALYTICS':
       return COOKIE_CONFIG.DURATION.ANALYTICS;
-    case 'marketing':
+    case 'MARKETING':
       return COOKIE_CONFIG.DURATION.MARKETING;
-    case 'preferences':
+    case 'PREFERENCES':
       return COOKIE_CONFIG.DURATION.PREFERENCES;
-    case 'necessary':
+    case 'NECESSARY':
     default:
       return COOKIE_CONFIG.DURATION.SESSION;
   }

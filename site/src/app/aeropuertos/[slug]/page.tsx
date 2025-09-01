@@ -1,39 +1,4 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { fetchAirportBySlug, type AirportDto, type StrapiItem } from "@/lib/strapi";
-
-type PageParams = Promise<{ slug: string }>;
-type PageProps = { params: PageParams };
-
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const item = await fetchAirportBySlug(slug);
-  const a = (item as StrapiItem<AirportDto> | null)?.attributes;
-  if (!a) return {};
-  const title = `${a.name} | Traslados VTC | LogroVTC`;
-  const description = a.description;
-  const url = `https://logro-vtc.vercel.app/aeropuertos/${slug}`;
-  return {
-    title,
-    description,
-    alternates: { canonical: url },
-    openGraph: { title, description, url, type: "article", locale: "es_ES" },
-    keywords: a.keywords,
-  };
-}
-
-export default async function AirportPage({ params }: PageProps) {
-  const { slug } = await params;
-  const item = await fetchAirportBySlug(slug);
-  const a = (item as StrapiItem<AirportDto> | null)?.attributes;
-  if (!a) return notFound();
-  return (
-    <main className="mx-auto max-w-5xl px-4 py-10">
-      <h1 className="text-3xl font-semibold tracking-tight">Traslados a {a.name}{a.code ? ` (${a.code})` : ""}</h1>
-      <p className="mt-3 text-muted-foreground">{a.intro}</p>
-    </main>
-  );
-}
+// Archivo depurado: dejamos una sola implementación completa
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -66,26 +31,28 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   if (isStrapiEnabled) {
-    const item = await fetchAirportBySlug(slug);
-    const a = item?.attributes;
-    if (a) {
-      const title = `${a.name} | Traslados VTC | LogroVTC`;
-      const description = a.description;
-      const url = `https://example.com/aeropuertos/${slug}`;
-      return {
-        title,
-        description,
-        alternates: { canonical: url },
-        openGraph: { title, description, url, type: "article", locale: "es_ES" },
-        keywords: a.keywords,
-      };
-    }
+    try {
+      const item = await fetchAirportBySlug(slug);
+      const a = item?.attributes;
+      if (a) {
+        const title = `${a.name} | Traslados VTC | LogroVTC`;
+        const description = a.description;
+        const url = `https://logro-vtc.vercel.app/aeropuertos/${slug}`;
+        return {
+          title,
+          description,
+          alternates: { canonical: url },
+          openGraph: { title, description, url, type: "article", locale: "es_ES" },
+          keywords: a.keywords,
+        };
+      }
+    } catch {}
   }
   const airport = getAirportBySlug(slug);
   if (!airport) return {};
   const title = `${airport.name} | Traslados VTC | LogroVTC`;
   const description = airport.description;
-  const url = `https://example.com/aeropuertos/${airport.slug}`;
+  const url = `https://logro-vtc.vercel.app/aeropuertos/${airport.slug}`;
   return {
     title,
     description,
@@ -99,19 +66,21 @@ export default async function AirportPage({ params }: PageProps) {
   const { slug } = await params;
   let airport: Airport | undefined = getAirportBySlug(slug);
   if (isStrapiEnabled) {
-    const item = await fetchAirportBySlug(slug);
-    const a = item?.attributes;
-    if (a) {
-      airport = {
-        slug,
-        name: a.name,
-        city: a.city ?? "",
-        code: a.code,
-        intro: a.intro,
-        description: a.description,
-        keywords: a.keywords ?? [],
-      };
-    }
+    try {
+      const item = await fetchAirportBySlug(slug);
+      const a = item?.attributes;
+      if (a) {
+        airport = {
+          slug,
+          name: a.name,
+          city: a.city ?? "",
+          code: a.code,
+          intro: a.intro,
+          description: a.description,
+          keywords: a.keywords ?? [],
+        };
+      }
+    } catch {}
   }
   if (!airport) return notFound();
 

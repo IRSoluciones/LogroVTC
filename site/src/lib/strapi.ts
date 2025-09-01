@@ -129,4 +129,47 @@ export async function fetchStationBySlug(slug: string) {
   return json.data[0] ?? null;
 }
 
+// FAQs
+export type FaqDto = {
+  question: string;
+  answer: string;
+};
+
+export async function fetchFaqs() {
+  return strapiFetch<StrapiListResponse<FaqDto>>("faqs", {
+    tags: ["faqs"],
+    params: { populate: "*" },
+  });
+}
+
+// Reviews
+export type ReviewDto = {
+  author: string;
+  rating: number;
+  content?: string;
+  featured?: boolean;
+};
+
+export async function fetchReviews(params?: QueryParams) {
+  return strapiFetch<StrapiListResponse<ReviewDto>>("reviews", {
+    tags: ["reviews"],
+    params: { populate: "*", ...(params || {}) },
+  });
+}
+
+// Global settings
+export type GlobalSettingsDto = {
+  phone?: string;
+  whatsapp?: string;
+  defaultSeoTitle?: string;
+  defaultSeoDescription?: string;
+};
+
+export async function fetchGlobalSettings() {
+  return strapiFetch<StrapiSingleResponse<GlobalSettingsDto>>("global", {
+    tags: ["global"],
+    params: { populate: "*" },
+  });
+}
+
 

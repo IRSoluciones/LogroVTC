@@ -1,7 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  turbopack: {
+    root: __dirname,
+  },
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "**.strapiapp.com" },
+      { protocol: "https", hostname: "**.railway.app" },
+      { protocol: "https", hostname: "**.onrender.com" },
+      { protocol: "http", hostname: "localhost", port: "1337" },
+    ],
+  },
 };
 
 export default nextConfig;
