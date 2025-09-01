@@ -27,6 +27,8 @@ import ServiceModal from "@/components/ui/modal";
 import GenericModal from "@/components/ui/generic-modal";
 import Reveal from "@/components/visual/Reveal";
 import { airports, stations } from "@/lib/site-data";
+import Reviews from "@/components/sections/Reviews";
+import { isStrapiEnabled } from "@/lib/strapi";
 
 export default function HomePage() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -171,54 +173,8 @@ export default function HomePage() {
 
       {/* OPINIONES DE CLIENTES */}
       <Reveal>
-        <section id="opiniones" className="mt-24">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-semibold">Lo que dicen nuestros clientes</h3>
-            <p className="mt-3 text-muted-foreground">Experiencias reales de viajeros que han confiado en nuestros servicios</p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { name: "melanie dorado", avatar: "m", bg: "bg-orange-500", time: "Hace 2 semanas", review: "Tuvimos una experiencia buenisa. Todos los choferes son muy amables y destacar la limpieza de los vehículos. Muy recomendable 10 de 10", isNew: true },
-              { name: "Ana Car", avatar: "A", bg: "bg-blue-500", time: "Hace un mes", review: "Me ha tocado ir un par de veces a la estación de madrugada desde Villamediana... Ninguna queja las veces que lo he utilizado", reviews: "11 reseñas" },
-              { name: "Carme Puig", avatar: "C", bg: "bg-purple-500", time: "Hace 3 meses", review: "Super atentos y muy amables, puntualidad de 10... nos llevaron de Logroño a Roncesvalles y todo fue genial." },
-              { name: "Martina Arnáez García", avatar: "", bg: "bg-amber-200", time: "Hace 7 años", review: "Hemos utilizado sus servicios de taxi y nos atendieron muy bien. Nos enseñaron muchas cosas bonitas..." },
-              { name: "Marijo Rodríguez de Aspiunza", avatar: "👓", bg: "bg-blue-400", time: "Hace 2 años", review: "Amabilidad y buen servicio, a un precio adecuado..." },
-              { name: "Francisco Javier Garcia Garcia", avatar: "F", bg: "bg-purple-500", time: "Hace 3 semanas", review: "Taxi laguardia genial", isNew: true }
-            ].map((review, i) => (
-              <Reveal key={i} delay={i * 80}>
-                <Card className="border-border/80 bg-gradient-to-br from-card to-card/60">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className={`w-12 h-12 rounded-full ${review.bg} flex items-center justify-center text-white font-semibold text-lg`}>
-                        {review.avatar || (review.name === "Martina Arnáez García" ? <div className="w-8 h-8 bg-gradient-to-br from-amber-600 to-brown-600 rounded-full"></div> : review.name.charAt(0))}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold">{review.name}</h4>
-                        {review.reviews && <div className="text-sm text-muted-foreground">{review.reviews}</div>}
-                      </div>
-                      <div className="text-xs text-muted-foreground">{review.time}</div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="flex text-yellow-400">
-                        {[...Array(5)].map((_, i) => (
-                          <span key={i} className="text-lg">★</span>
-                        ))}
-                      </div>
-                      <span className="font-semibold text-sm">5/5</span>
-                      {review.isNew && <span className="bg-black text-white text-xs px-2 py-1 rounded">NUEVA</span>}
-                    </div>
-                    
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      &ldquo;{review.review}&rdquo;
-                    </p>
-                  </CardContent>
-                </Card>
-              </Reveal>
-            ))}
-          </div>
-        </section>
+        {/* Reviews con Strapi (home) o fallback */}
+        <Reviews context="home" />
       </Reveal>
 
       {/* SECCIÓN AEROPUERTO (layout alterno con overlay) */}
@@ -266,12 +222,12 @@ export default function HomePage() {
                       {airports.slice(5).map((a) => (
                         <li key={a.slug}>
                           <Link className="underline" href={`/aeropuertos/${a.slug}`}>{a.name}</Link>
-                        </li>
+          </li>
                       ))}
                       {stations.map((s) => (
                         <li key={s.slug}>
                           <Link className="underline" href={`/estaciones/${s.slug}`}>{s.name}</Link>
-                        </li>
+          </li>
                       ))}
                       <li>Otros bajo solicitud</li>
                     </ul>

@@ -132,10 +132,12 @@ export default async function AirportPage({ params }: PageProps) {
       </section>
 
       <Reveal><ServicesNav /></Reveal>
-      <Reveal><Reviews /></Reveal>
+      <Reveal><Reviews context="airport" slug={airport.slug} /></Reveal>
       <Reveal><Gallery count={8} /></Reveal>
 
-      <Reveal><FAQs items={getAirportFaqs()} /></Reveal>
+      <Reveal>
+        <AirportFaqs slug={airport.slug} />
+      </Reveal>
 
       <Reveal><OtherServices /></Reveal>
       <Reveal><CTASection /></Reveal>
@@ -154,6 +156,21 @@ function getAirportFaqs() {
     { q: "¿Hacéis esperas o paradas?", a: "Podemos incluir una parada breve o un tiempo de espera; se cotiza según el caso." },
     { q: "¿Dais precio cerrado?", a: "Sí, ofrecemos precio cerrado según origen/destino y condiciones del servicio." },
   ];
+}
+
+// FAQs dinámicas desde Strapi con fallback
+import { fetchFaqsBy } from "@/lib/strapi";
+
+async function AirportFaqs({ slug }: { slug: string }) {
+  let items = getAirportFaqs();
+  if (isStrapiEnabled) {
+    try {
+      const json = await fetchFaqsBy("airport", slug);
+      const list = json.data.map((it) => ({ q: it.attributes.question, a: it.attributes.answer }));
+      if (list.length > 0) items = list;
+    } catch {}
+  }
+  return <FAQs items={items} />;
 }
 
 

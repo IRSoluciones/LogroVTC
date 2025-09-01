@@ -131,6 +131,8 @@ export async function fetchStationBySlug(slug: string) {
 
 // FAQs
 export type FaqDto = {
+  context?: 'service' | 'airport' | 'station';
+  slug?: string;
   question: string;
   answer: string;
 };
@@ -142,12 +144,25 @@ export async function fetchFaqs() {
   });
 }
 
+export async function fetchFaqsBy(context: "service" | "airport" | "station", slug: string) {
+  return strapiFetch<StrapiListResponse<FaqDto>>("faqs", {
+    tags: ["faqs"],
+    params: {
+      "filters[context][$eq]": context,
+      "filters[slug][$eq]": slug,
+      sort: "id:asc",
+    },
+  });
+}
+
 // Reviews
 export type ReviewDto = {
   author: string;
   rating: number;
   content?: string;
   featured?: boolean;
+  context?: 'home' | 'service' | 'airport' | 'station';
+  slug?: string;
 };
 
 export async function fetchReviews(params?: QueryParams) {
@@ -155,6 +170,12 @@ export async function fetchReviews(params?: QueryParams) {
     tags: ["reviews"],
     params: { populate: "*", ...(params || {}) },
   });
+}
+
+export async function fetchReviewsBy(context: "home" | "service" | "airport" | "station", slug?: string) {
+  const params: QueryParams = { "filters[context][$eq]": context, sort: "id:asc" };
+  if (slug) params["filters[slug][$eq]"] = slug;
+  return fetchReviews(params);
 }
 
 // Global settings

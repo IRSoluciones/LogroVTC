@@ -13,7 +13,9 @@
     "author": { "type": "string", "required": true },
     "rating": { "type": "integer", "min": 1, "max": 5, "required": true },
     "content": { "type": "text" },
-    "featured": { "type": "boolean", "default": false }
+    "featured": { "type": "boolean", "default": false },
+    "context": { "type": "enumeration", "enum": ["home", "service", "airport", "station"], "default": "home" },
+    "slug": { "type": "string" }
   }
 }
 

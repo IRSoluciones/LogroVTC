@@ -142,10 +142,12 @@ export default async function ServicePage({ params }: PageProps) {
       )}
 
       <Reveal><ServicesNav /></Reveal>
-      <Reveal><Reviews /></Reveal>
+      <Reveal><Reviews context="service" slug={service.slug} /></Reveal>
       <Reveal><Gallery count={8} /></Reveal>
 
-      <Reveal><FAQs items={getServiceFaqs(service.slug)} /></Reveal>
+      <Reveal>
+        <ServiceFaqs slug={service.slug} />
+      </Reveal>
 
       <Reveal><OtherServices /></Reveal>
       <Reveal><CTASection /></Reveal>
@@ -189,6 +191,21 @@ function getServiceFaqs(slug: string) {
     { q: "¿Seguro de mercancías?", a: "Contamos con cobertura; para envíos de alto valor, podemos ampliar la póliza bajo petición." },
     { q: "¿Recogidas múltiples?", a: "Podemos programar varias paradas manteniendo el recorrido directo; lo presupuestamos a medida." },
   ];
+}
+
+// FAQs dinámicas desde Strapi con fallback
+import { fetchFaqsBy } from "@/lib/strapi";
+
+async function ServiceFaqs({ slug }: { slug: string }) {
+  let items = getServiceFaqs(slug);
+  if (isStrapiEnabled) {
+    try {
+      const json = await fetchFaqsBy("service", slug);
+      const list = json.data.map((it) => ({ q: it.attributes.question, a: it.attributes.answer }));
+      if (list.length > 0) items = list;
+    } catch {}
+  }
+  return <FAQs items={items} />;
 }
 
 

@@ -123,10 +123,12 @@ export default async function StationPage({ params }: PageProps) {
       </section>
 
       <Reveal><ServicesNav /></Reveal>
-      <Reveal><Reviews /></Reveal>
+      <Reveal><Reviews context="station" slug={station.slug} /></Reveal>
       <Reveal><Gallery count={8} /></Reveal>
 
-      <Reveal><FAQs items={getStationFaqs()} /></Reveal>
+      <Reveal>
+        <StationFaqs slug={station.slug} />
+      </Reveal>
 
       <Reveal><OtherServices /></Reveal>
       <Reveal><CTASection /></Reveal>
@@ -145,6 +147,21 @@ function getStationFaqs() {
     { q: "¿Realizáis traslados entre estaciones?", a: "Sí, conectamos estaciones y aeropuertos, y podemos incluir paradas intermedias." },
     { q: "¿Qué ocurre si pierdo el tren?", a: "Podemos reprogramar el servicio sujeto a disponibilidad; indícanos la nueva hora cuanto antes." },
   ];
+}
+
+// FAQs dinámicas desde Strapi con fallback
+import { fetchFaqsBy } from "@/lib/strapi";
+
+async function StationFaqs({ slug }: { slug: string }) {
+  let items = getStationFaqs();
+  if (isStrapiEnabled) {
+    try {
+      const json = await fetchFaqsBy("station", slug);
+      const list = json.data.map((it) => ({ q: it.attributes.question, a: it.attributes.answer }));
+      if (list.length > 0) items = list;
+    } catch {}
+  }
+  return <FAQs items={items} />;
 }
 
 
