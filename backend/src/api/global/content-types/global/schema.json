@@ -1,0 +1,20 @@
+{
+  "kind": "singleType",
+  "collectionName": "globals",
+  "info": {
+    "singularName": "global",
+    "pluralName": "globals",
+    "displayName": "Global Settings"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "phone": { "type": "string" },
+    "whatsapp": { "type": "string" },
+    "defaultSeoTitle": { "type": "string" },
+    "defaultSeoDescription": { "type": "text" }
+  }
+}
+
+

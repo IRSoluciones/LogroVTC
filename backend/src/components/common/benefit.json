@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_common_benefits",
+  "info": {
+    "displayName": "benefit",
+    "description": "Benefit block with title and description"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "desc": {
+      "type": "text",
+      "required": true
+    }
+  }
+}
+
+
