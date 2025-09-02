@@ -29,6 +29,10 @@ export async function POST(req: Request) {
     ? "airports"
     : model?.includes("station")
     ? "stations"
+    : model?.includes("faq")
+    ? "faqs"
+    : model?.includes("review")
+    ? "reviews"
     : undefined;
 
   if (tag) {

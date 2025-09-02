@@ -173,8 +173,20 @@ export async function fetchReviews(params?: QueryParams) {
 }
 
 export async function fetchReviewsBy(context: "home" | "service" | "airport" | "station", slug?: string) {
-  const params: QueryParams = { "filters[context][$eq]": context, sort: "id:asc" };
-  if (slug) params["filters[slug][$eq]"] = slug;
+  // Construimos manualmente los filtros para evitar `any`
+  const base = new URLSearchParams();
+  base.set("sort", "id:asc");
+  if (context === "home" && !slug) {
+    base.set("filters[$or][0][context][$eq]", "home");
+    base.set("filters[$or][1][context][$null]", "true");
+  } else {
+    base.set("filters[context][$eq]", context);
+    if (slug) base.set("filters[slug][$eq]", slug);
+  }
+  const params: Record<string, string> = {};
+  base.forEach((value, key) => {
+    params[key] = value;
+  });
   return fetchReviews(params);
 }
 

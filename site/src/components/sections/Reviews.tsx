@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { isStrapiEnabled, fetchReviewsBy, type ReviewDto, type StrapiListResponse } from "@/lib/strapi";
+import { isStrapiEnabled, fetchReviewsBy, fetchReviews, type ReviewDto } from "@/lib/strapi";
 
 type ReviewsProps = {
   context?: "home" | "service" | "airport" | "station";
@@ -10,8 +10,13 @@ export default async function Reviews({ context = "home", slug }: ReviewsProps) 
   let reviews: ReviewDto[] = [];
   if (isStrapiEnabled) {
     try {
-      const json = await fetchReviewsBy(context, slug);
-      reviews = json.data.map((it) => ({ ...it.attributes }));
+      const byCtx = await fetchReviewsBy(context, slug);
+      reviews = byCtx.data.map((it) => ({ ...it.attributes }));
+      // Si no hay reviews con contexto/slug (entradas antiguas sin campo), intentamos sin filtro
+      if (reviews.length === 0) {
+        const all = await fetchReviews();
+        reviews = all.data.map((it) => ({ ...it.attributes }));
+      }
     } catch {}
   }
 
