@@ -1,12 +1,24 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
 type GalleryProps = { count?: number };
 
 export default function Gallery({ count = 8 }: GalleryProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const images = Array.from({ length: 16 }, (_, i) => `/vehicles/vehicle-${i + 1}.jpg`).slice(0, count);
+  const [images, setImages] = useState<string[]>(Array.from({ length: count }, (_, i) => `/vehicles/vehicle-${i + 1}.jpg`));
+
+  useEffect(() => {
+    fetch(`/api/public/gallery?limit=${count}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((json) => {
+        if (json?.ok && Array.isArray(json.images) && json.images.length > 0) {
+          const urls = json.images.map((it: { url: string }) => it.url);
+          setImages(urls);
+        }
+      })
+      .catch(() => {});
+  }, [count]);
 
   return (
     <section id="galeria" className="mt-24">
