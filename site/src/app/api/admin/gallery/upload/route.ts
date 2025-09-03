@@ -25,7 +25,6 @@ export async function POST(req: Request) {
     for (const f of files) {
       if (!(f instanceof File)) continue;
       const arrayBuffer = await f.arrayBuffer();
-      const fileExt = f.name.split(".").pop() || "bin";
       const safeName = f.name.replace(/[^a-zA-Z0-9_.-]/g, "_");
       const filePath = `gallery/${Date.now()}-${Math.random().toString(36).slice(2)}-${safeName}`;
       const { error: upErr } = await supabase.storage.from("gallery").upload(filePath, arrayBuffer, {

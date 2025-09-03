@@ -229,6 +229,19 @@ function ServicesAdmin({ headers }: { headers: Record<string, string> }) {
     await fetch(`/api/admin/services?slug=${encodeURIComponent(slug)}`, { method: "DELETE", headers });
     load();
   }
+  function edit(it: ServiceRow) {
+    setForm({
+      slug: it.slug,
+      name: it.name,
+      title: it.title,
+      description: it.description,
+      intro: it.intro,
+      keywords: (it.keywords || []).join(", "),
+    });
+  }
+  function resetForm() {
+    setForm({ slug: "", name: "", title: "", description: "", intro: "", keywords: "" });
+  }
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
@@ -239,7 +252,10 @@ function ServicesAdmin({ headers }: { headers: Record<string, string> }) {
           <Textarea placeholder="description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           <Textarea placeholder="intro" value={form.intro} onChange={(e) => setForm({ ...form, intro: e.target.value })} />
           <Input placeholder="keywords (coma)" value={form.keywords} onChange={(e) => setForm({ ...form, keywords: e.target.value })} />
-          <Button onClick={submit}>Guardar</Button>
+          <div className="flex gap-2">
+            <Button onClick={submit}>{items.find((i) => i.slug === form.slug) ? "Actualizar" : "Guardar"}</Button>
+            <Button variant="outline" onClick={resetForm}>Nuevo</Button>
+          </div>
         </CardContent>
       </Card>
       <div className="grid gap-3">
@@ -247,7 +263,10 @@ function ServicesAdmin({ headers }: { headers: Record<string, string> }) {
           <Card key={it.slug}>
             <CardContent className="p-4 flex items-center justify-between">
               <div className="font-medium">{it.slug} · {it.name}</div>
-              <Button variant="outline" onClick={() => remove(it.slug)}>Eliminar</Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => edit(it)}>Editar</Button>
+                <Button variant="outline" onClick={() => remove(it.slug)}>Eliminar</Button>
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -275,6 +294,20 @@ function AirportsAdmin({ headers }: { headers: Record<string, string> }) {
     await fetch(`/api/admin/aeropuertos?slug=${encodeURIComponent(slug)}`, { method: "DELETE", headers });
     load();
   }
+  function edit(it: AirportRow) {
+    setForm({
+      slug: it.slug,
+      name: it.name,
+      city: it.city || "",
+      code: it.code || "",
+      intro: it.intro,
+      description: it.description,
+      keywords: (it.keywords || []).join(", "),
+    });
+  }
+  function resetForm() {
+    setForm({ slug: "", name: "", city: "", code: "", intro: "", description: "", keywords: "" });
+  }
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
@@ -286,7 +319,10 @@ function AirportsAdmin({ headers }: { headers: Record<string, string> }) {
           <Textarea placeholder="intro" value={form.intro} onChange={(e) => setForm({ ...form, intro: e.target.value })} />
           <Textarea placeholder="description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           <Input placeholder="keywords (coma)" value={form.keywords} onChange={(e) => setForm({ ...form, keywords: e.target.value })} />
-          <Button onClick={submit}>Guardar</Button>
+          <div className="flex gap-2">
+            <Button onClick={submit}>{items.find((i) => i.slug === form.slug) ? "Actualizar" : "Guardar"}</Button>
+            <Button variant="outline" onClick={resetForm}>Nuevo</Button>
+          </div>
         </CardContent>
       </Card>
       <div className="grid gap-3">
@@ -294,7 +330,10 @@ function AirportsAdmin({ headers }: { headers: Record<string, string> }) {
           <Card key={it.slug}>
             <CardContent className="p-4 flex items-center justify-between">
               <div className="font-medium">{it.slug} · {it.name}</div>
-              <Button variant="outline" onClick={() => remove(it.slug)}>Eliminar</Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => edit(it)}>Editar</Button>
+                <Button variant="outline" onClick={() => remove(it.slug)}>Eliminar</Button>
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -322,6 +361,20 @@ function StationsAdmin({ headers }: { headers: Record<string, string> }) {
     await fetch(`/api/admin/estaciones?slug=${encodeURIComponent(slug)}`, { method: "DELETE", headers });
     load();
   }
+  function edit(it: StationRow) {
+    setForm({
+      slug: it.slug,
+      name: it.name,
+      city: it.city || "",
+      type: it.type,
+      intro: it.intro,
+      description: it.description,
+      keywords: (it.keywords || []).join(", "),
+    });
+  }
+  function resetForm() {
+    setForm({ slug: "", name: "", city: "", type: "tren", intro: "", description: "", keywords: "" });
+  }
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
@@ -337,7 +390,10 @@ function StationsAdmin({ headers }: { headers: Record<string, string> }) {
           <Textarea placeholder="intro" value={form.intro} onChange={(e) => setForm({ ...form, intro: e.target.value })} />
           <Textarea placeholder="description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           <Input placeholder="keywords (coma)" value={form.keywords} onChange={(e) => setForm({ ...form, keywords: e.target.value })} />
-          <Button onClick={submit}>Guardar</Button>
+          <div className="flex gap-2">
+            <Button onClick={submit}>{items.find((i) => i.slug === form.slug) ? "Actualizar" : "Guardar"}</Button>
+            <Button variant="outline" onClick={resetForm}>Nuevo</Button>
+          </div>
         </CardContent>
       </Card>
       <div className="grid gap-3">
@@ -345,7 +401,10 @@ function StationsAdmin({ headers }: { headers: Record<string, string> }) {
           <Card key={it.slug}>
             <CardContent className="p-4 flex items-center justify-between">
               <div className="font-medium">{it.slug} · {it.name}</div>
-              <Button variant="outline" onClick={() => remove(it.slug)}>Eliminar</Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => edit(it)}>Editar</Button>
+                <Button variant="outline" onClick={() => remove(it.slug)}>Eliminar</Button>
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -372,14 +431,9 @@ function GalleryAdmin({ headers }: { headers: Record<string, string> }) {
     fd.append("alt", form.alt);
     fd.append("position", String(form.position));
     fd.append("active", String(form.active));
-    await fetch("/api/admin/gallery/upload", { method: "POST", headers: { ...headers }, body: fd as any });
+    await fetch("/api/admin/gallery/upload", { method: "POST", headers: { ...headers }, body: fd });
     setForm({ url: "", alt: "", position: 0, active: true });
     void load();
-  }
-  async function submit() {
-    await fetch("/api/admin/gallery", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(form) });
-    setForm({ url: "", alt: "", position: 0, active: true });
-    load();
   }
   async function remove(id?: number) {
     if (!id) return;
