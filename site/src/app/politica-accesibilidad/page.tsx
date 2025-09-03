@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Accessibility, Eye, Ear, Hand, Brain, CheckCircle, AlertCircle, Calendar, Phone, Mail, FileText } from "lucide-react";
+import { Accessibility, Eye, Ear, Hand, Brain, CheckCircle, AlertCircle, Calendar, Phone, Mail } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Política de Accesibilidad | LogroVTC",

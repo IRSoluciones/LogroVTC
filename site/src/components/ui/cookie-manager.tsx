@@ -21,10 +21,10 @@ export default function CookieManager({ open, onOpenChange, hideTrigger = false,
   const setOpen = isControlled ? (onOpenChange as (open: boolean) => void) : setIsOpenState;
   const { 
     preferences, 
-    consentDate, 
+    // consentDate,
     savePreferences, 
     togglePreference, 
-    resetPreferences,
+    // resetPreferences,
     acceptAll,
     acceptNecessary 
   } = useCookies();

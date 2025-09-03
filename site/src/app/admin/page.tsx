@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,18 @@ import { Textarea } from "@/components/ui/textarea";
 
 type Review = { id?: number; author: string; rating: number; content?: string; featured?: boolean; context?: string; slug?: string };
 type Faq = { id?: number; context: string; slug: string; question: string; answer: string };
+
+type ServiceRow = { slug: string; name: string; title: string; description: string; intro: string; keywords?: string[] };
+type ServiceForm = { slug: string; name: string; title: string; description: string; intro: string; keywords: string };
+
+type AirportRow = { slug: string; name: string; city?: string; code?: string; intro: string; description: string; keywords?: string[] };
+type AirportForm = { slug: string; name: string; city: string; code: string; intro: string; description: string; keywords: string };
+
+type StationRow = { slug: string; name: string; city?: string; type: "tren" | "bus"; intro: string; description: string; keywords?: string[] };
+type StationForm = { slug: string; name: string; city: string; type: "tren" | "bus"; intro: string; description: string; keywords: string };
+
+type GalleryRow = { id?: number; url: string; alt?: string; position?: number; active?: boolean };
+type GalleryForm = { url: string; alt: string; position: number; active: boolean };
 
 export default function AdminPage() {
   const [token, setToken] = useState<string>("");
@@ -78,12 +90,12 @@ export default function AdminPage() {
 function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
   const [items, setItems] = useState<Review[]>([]);
   const [form, setForm] = useState<Review>({ author: "", rating: 5, content: "", context: "home", slug: "" });
-  async function load() {
+  const load = useCallback(async () => {
     const res = await fetch("/api/admin/reviews", { headers });
     const json = await res.json();
     if (json.ok) setItems(json.reviews);
-  }
-  useEffect(() => { load(); }, []);
+  }, [headers]);
+  useEffect(() => { void load(); }, [load]);
 
   async function submit() {
     await fetch("/api/admin/reviews", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(form) });
@@ -127,12 +139,12 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
 function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
   const [items, setItems] = useState<Faq[]>([]);
   const [form, setForm] = useState<Faq>({ context: "service", slug: "", question: "", answer: "" });
-  async function load() {
+  const load = useCallback(async () => {
     const res = await fetch("/api/admin/faqs", { headers });
     const json = await res.json();
     if (json.ok) setItems(json.faqs);
-  }
-  useEffect(() => { load(); }, []);
+  }, [headers]);
+  useEffect(() => { void load(); }, [load]);
 
   async function submit() {
     await fetch("/api/admin/faqs", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(form) });
@@ -173,14 +185,14 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
 }
 
 function ServicesAdmin({ headers }: { headers: Record<string, string> }) {
-  const [items, setItems] = useState<any[]>([]);
-  const [form, setForm] = useState<any>({ slug: "", name: "", title: "", description: "", intro: "", keywords: "" });
-  async function load() {
+  const [items, setItems] = useState<ServiceRow[]>([]);
+  const [form, setForm] = useState<ServiceForm>({ slug: "", name: "", title: "", description: "", intro: "", keywords: "" });
+  const load = useCallback(async () => {
     const res = await fetch("/api/admin/services", { headers });
     const json = await res.json();
-    if (json.ok) setItems(json.services);
-  }
-  useEffect(() => { load(); }, []);
+    if (json.ok) setItems(json.services as ServiceRow[]);
+  }, [headers]);
+  useEffect(() => { void load(); }, [load]);
   async function submit() {
     const payload = { ...form, keywords: form.keywords ? form.keywords.split(",").map((s: string) => s.trim()).filter(Boolean) : [] };
     await fetch("/api/admin/services", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(payload) });
@@ -219,14 +231,14 @@ function ServicesAdmin({ headers }: { headers: Record<string, string> }) {
 }
 
 function AirportsAdmin({ headers }: { headers: Record<string, string> }) {
-  const [items, setItems] = useState<any[]>([]);
-  const [form, setForm] = useState<any>({ slug: "", name: "", city: "", code: "", intro: "", description: "", keywords: "" });
-  async function load() {
+  const [items, setItems] = useState<AirportRow[]>([]);
+  const [form, setForm] = useState<AirportForm>({ slug: "", name: "", city: "", code: "", intro: "", description: "", keywords: "" });
+  const load = useCallback(async () => {
     const res = await fetch("/api/admin/aeropuertos", { headers });
     const json = await res.json();
-    if (json.ok) setItems(json.airports);
-  }
-  useEffect(() => { load(); }, []);
+    if (json.ok) setItems(json.airports as AirportRow[]);
+  }, [headers]);
+  useEffect(() => { void load(); }, [load]);
   async function submit() {
     const payload = { ...form, keywords: form.keywords ? form.keywords.split(",").map((s: string) => s.trim()).filter(Boolean) : [] };
     await fetch("/api/admin/aeropuertos", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(payload) });
@@ -266,14 +278,14 @@ function AirportsAdmin({ headers }: { headers: Record<string, string> }) {
 }
 
 function StationsAdmin({ headers }: { headers: Record<string, string> }) {
-  const [items, setItems] = useState<any[]>([]);
-  const [form, setForm] = useState<any>({ slug: "", name: "", city: "", type: "tren", intro: "", description: "", keywords: "" });
-  async function load() {
+  const [items, setItems] = useState<StationRow[]>([]);
+  const [form, setForm] = useState<StationForm>({ slug: "", name: "", city: "", type: "tren", intro: "", description: "", keywords: "" });
+  const load = useCallback(async () => {
     const res = await fetch("/api/admin/estaciones", { headers });
     const json = await res.json();
-    if (json.ok) setItems(json.stations);
-  }
-  useEffect(() => { load(); }, []);
+    if (json.ok) setItems(json.stations as StationRow[]);
+  }, [headers]);
+  useEffect(() => { void load(); }, [load]);
   async function submit() {
     const payload = { ...form, keywords: form.keywords ? form.keywords.split(",").map((s: string) => s.trim()).filter(Boolean) : [] };
     await fetch("/api/admin/estaciones", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(payload) });
@@ -313,14 +325,14 @@ function StationsAdmin({ headers }: { headers: Record<string, string> }) {
 }
 
 function GalleryAdmin({ headers }: { headers: Record<string, string> }) {
-  const [items, setItems] = useState<any[]>([]);
-  const [form, setForm] = useState<any>({ url: "", alt: "", position: 0, active: true });
-  async function load() {
+  const [items, setItems] = useState<GalleryRow[]>([]);
+  const [form, setForm] = useState<GalleryForm>({ url: "", alt: "", position: 0, active: true });
+  const load = useCallback(async () => {
     const res = await fetch("/api/admin/gallery", { headers });
     const json = await res.json();
-    if (json.ok) setItems(json.images);
-  }
-  useEffect(() => { load(); }, []);
+    if (json.ok) setItems(json.images as GalleryRow[]);
+  }, [headers]);
+  useEffect(() => { void load(); }, [load]);
   async function submit() {
     await fetch("/api/admin/gallery", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(form) });
     setForm({ url: "", alt: "", position: 0, active: true });
