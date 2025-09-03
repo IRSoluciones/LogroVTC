@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -115,6 +116,7 @@ export default function AdminPage() {
 function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
   const [items, setItems] = useState<Review[]>([]);
   const [form, setForm] = useState<Review>({ author: "", rating: 5, content: "", context: "home", slug: "" });
+  const [notice, setNotice] = useState<string>("");
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/reviews", { headers });
     const json = await res.json();
@@ -123,13 +125,16 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
   useEffect(() => { void load(); }, [load]);
 
   async function submit() {
-    await fetch("/api/admin/reviews", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(form) });
+    const resp = await fetch("/api/admin/reviews", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(form) });
+    setNotice(resp.ok ? "Guardado" : "Error guardando");
     setForm({ author: "", rating: 5, content: "", context: "home", slug: "" });
     load();
   }
   async function remove(id?: number) {
     if (!id) return;
-    await fetch(`/api/admin/reviews?id=${id}`, { method: "DELETE", headers });
+    if (!confirm("¿Eliminar review?")) return;
+    const resp = await fetch(`/api/admin/reviews?id=${id}`, { method: "DELETE", headers });
+    setNotice(resp.ok ? "Eliminado" : "Error eliminando");
     load();
   }
   function edit(r: Review) {
@@ -142,6 +147,7 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
         <CardContent className="p-5 grid gap-2">
+          {notice && <div className="text-xs text-green-700 bg-green-50 border border-green-200 rounded px-2 py-1">{notice}</div>}
           {form.id ? <div className="text-xs text-muted-foreground">Editando ID #{form.id}</div> : null}
           <Input placeholder="Autor" value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })} />
           <Input placeholder="Rating (1-5)" type="number" value={form.rating} onChange={(e) => setForm({ ...form, rating: Number(e.target.value) })} />
@@ -155,6 +161,7 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
         </CardContent>
       </Card>
       <div className="grid gap-3">
+        {items.length === 0 && <div className="text-sm text-muted-foreground">No hay reviews publicadas.</div>}
         {items.map((r) => (
           <Card key={r.id}>
             <CardContent className="p-4">
@@ -177,6 +184,7 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
 function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
   const [items, setItems] = useState<Faq[]>([]);
   const [form, setForm] = useState<Faq>({ context: "service", slug: "", question: "", answer: "" });
+  const [notice, setNotice] = useState<string>("");
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/faqs", { headers });
     const json = await res.json();
@@ -185,13 +193,16 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
   useEffect(() => { void load(); }, [load]);
 
   async function submit() {
-    await fetch("/api/admin/faqs", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(form) });
+    const resp = await fetch("/api/admin/faqs", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(form) });
+    setNotice(resp.ok ? "Guardado" : "Error guardando");
     setForm({ context: "service", slug: "", question: "", answer: "" });
     load();
   }
   async function remove(id?: number) {
     if (!id) return;
-    await fetch(`/api/admin/faqs?id=${id}`, { method: "DELETE", headers });
+    if (!confirm("¿Eliminar FAQ?")) return;
+    const resp = await fetch(`/api/admin/faqs?id=${id}`, { method: "DELETE", headers });
+    setNotice(resp.ok ? "Eliminado" : "Error eliminando");
     load();
   }
   function edit(f: Faq) {
@@ -204,6 +215,7 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
         <CardContent className="p-5 grid gap-2">
+          {notice && <div className="text-xs text-green-700 bg-green-50 border border-green-200 rounded px-2 py-1">{notice}</div>}
           {form.id ? <div className="text-xs text-muted-foreground">Editando ID #{form.id}</div> : null}
           <Input placeholder="Contexto (service/airport/station)" value={form.context} onChange={(e) => setForm({ ...form, context: e.target.value })} />
           <Input placeholder="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} />
@@ -216,6 +228,7 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
         </CardContent>
       </Card>
       <div className="grid gap-3">
+        {items.length === 0 && <div className="text-sm text-muted-foreground">No hay FAQs publicadas.</div>}
         {items.map((f) => (
           <Card key={f.id}>
             <CardContent className="p-4 flex items-center justify-between gap-3">
@@ -500,10 +513,18 @@ function GalleryAdmin({ headers }: { headers: Record<string, string> }) {
         </CardContent>
       </Card>
       <div className="grid gap-3">
+        {items.length === 0 && <div className="text-sm text-muted-foreground">No hay imágenes en la galería.</div>}
         {items.map((it, idx) => (
           <Card key={it.id ?? idx}>
             <CardContent className="p-4 grid gap-2">
-              <div className="text-sm truncate">{it.url}</div>
+              <div className="flex items-center gap-3">
+                <div className="relative w-24 h-16 shrink-0 border rounded overflow-hidden bg-muted">
+                  {it.url ? (
+                    <Image src={it.url} alt={it.alt || ""} fill className="object-cover" />
+                  ) : null}
+                </div>
+                <div className="text-sm truncate">{it.url}</div>
+              </div>
               <div className="grid grid-cols-3 gap-2">
                 <Input placeholder="alt" value={it.alt || ""} onChange={(e) => setItems((arr) => arr.map((x, i) => i === idx ? { ...x, alt: e.target.value } : x))} />
                 <Input placeholder="posición" type="number" value={it.position ?? 0} onChange={(e) => setItems((arr) => arr.map((x, i) => i === idx ? { ...x, position: Number(e.target.value) } : x))} />
