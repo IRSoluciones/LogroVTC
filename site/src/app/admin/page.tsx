@@ -11,7 +11,10 @@ type Faq = { id?: number; context: string; slug: string; question: string; answe
 export default function AdminPage() {
   const [token, setToken] = useState<string>("");
   const [tokenInput, setTokenInput] = useState<string>("");
-  const headers = useMemo(() => (token ? { Authorization: `Bearer ${token}` } : {}), [token]);
+  const headers = useMemo<Record<string, string>>(
+    () => (token ? { Authorization: `Bearer ${token}` } : {}),
+    [token]
+  );
 
   useEffect(() => {
     const saved = localStorage.getItem("admin_token");
