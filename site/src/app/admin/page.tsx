@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import { ToastProvider, useToast } from "@/components/ui/toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,6 +56,7 @@ export default function AdminPage() {
   }
 
   return (
+    <ToastProvider>
     <main className="mx-auto max-w-6xl px-4 py-8 grid gap-6">
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/50 border-b py-3">
         <div className="flex flex-wrap gap-2">
@@ -110,6 +112,7 @@ export default function AdminPage() {
         </section>
       )}
     </main>
+    </ToastProvider>
   );
 }
 
@@ -117,6 +120,7 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
   const [items, setItems] = useState<Review[]>([]);
   const [form, setForm] = useState<Review>({ author: "", rating: 5, content: "", context: "home", slug: "" });
   const [notice, setNotice] = useState<string>("");
+  const { toast } = useToast();
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/reviews", { headers });
     const json = await res.json();
@@ -127,6 +131,7 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
   async function submit() {
     const resp = await fetch("/api/admin/reviews", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(form) });
     setNotice(resp.ok ? "Guardado" : "Error guardando");
+    toast(resp.ok ? "Review guardada" : "Error guardando", resp.ok ? "success" : "error");
     setForm({ author: "", rating: 5, content: "", context: "home", slug: "" });
     load();
   }
@@ -135,6 +140,7 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
     if (!confirm("¿Eliminar review?")) return;
     const resp = await fetch(`/api/admin/reviews?id=${id}`, { method: "DELETE", headers });
     setNotice(resp.ok ? "Eliminado" : "Error eliminando");
+    toast(resp.ok ? "Review eliminada" : "Error eliminando", resp.ok ? "success" : "error");
     load();
   }
   function edit(r: Review) {
@@ -185,6 +191,7 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
   const [items, setItems] = useState<Faq[]>([]);
   const [form, setForm] = useState<Faq>({ context: "service", slug: "", question: "", answer: "" });
   const [notice, setNotice] = useState<string>("");
+  const { toast } = useToast();
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/faqs", { headers });
     const json = await res.json();
@@ -195,6 +202,7 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
   async function submit() {
     const resp = await fetch("/api/admin/faqs", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(form) });
     setNotice(resp.ok ? "Guardado" : "Error guardando");
+    toast(resp.ok ? "FAQ guardada" : "Error guardando", resp.ok ? "success" : "error");
     setForm({ context: "service", slug: "", question: "", answer: "" });
     load();
   }
@@ -203,6 +211,7 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
     if (!confirm("¿Eliminar FAQ?")) return;
     const resp = await fetch(`/api/admin/faqs?id=${id}`, { method: "DELETE", headers });
     setNotice(resp.ok ? "Eliminado" : "Error eliminando");
+    toast(resp.ok ? "FAQ eliminada" : "Error eliminando", resp.ok ? "success" : "error");
     load();
   }
   function edit(f: Faq) {
@@ -461,6 +470,7 @@ function GalleryAdmin({ headers }: { headers: Record<string, string> }) {
   }, [headers]);
   useEffect(() => { void load(); }, [load]);
   const [dragOver, setDragOver] = useState(false);
+  const { toast } = useToast();
 
   async function onDropFiles(files: FileList | null) {
     if (!files || files.length === 0) return;
@@ -469,17 +479,20 @@ function GalleryAdmin({ headers }: { headers: Record<string, string> }) {
     fd.append("alt", form.alt);
     fd.append("position", String(form.position));
     fd.append("active", String(form.active));
-    await fetch("/api/admin/gallery/upload", { method: "POST", headers: { ...headers }, body: fd });
+    const resp = await fetch("/api/admin/gallery/upload", { method: "POST", headers: { ...headers }, body: fd });
+    toast(resp.ok ? "Imágenes subidas" : "Error subiendo", resp.ok ? "success" : "error");
     setForm({ url: "", alt: "", position: 0, active: true });
     void load();
   }
   async function remove(id?: number) {
     if (!id) return;
-    await fetch(`/api/admin/gallery?id=${id}`, { method: "DELETE", headers });
+    const resp = await fetch(`/api/admin/gallery?id=${id}`, { method: "DELETE", headers });
+    toast(resp.ok ? "Imagen eliminada" : "Error eliminando", resp.ok ? "success" : "error");
     load();
   }
   async function update(it: GalleryRow) {
-    await fetch("/api/admin/gallery", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(it) });
+    const resp = await fetch("/api/admin/gallery", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(it) });
+    toast(resp.ok ? "Imagen actualizada" : "Error actualizando", resp.ok ? "success" : "error");
     load();
   }
   return (
