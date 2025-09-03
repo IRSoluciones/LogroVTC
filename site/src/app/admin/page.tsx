@@ -107,16 +107,26 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
     await fetch(`/api/admin/reviews?id=${id}`, { method: "DELETE", headers });
     load();
   }
+  function edit(r: Review) {
+    setForm({ id: r.id, author: r.author, rating: r.rating, content: r.content || "", featured: r.featured, context: r.context, slug: r.slug });
+  }
+  function resetForm() {
+    setForm({ author: "", rating: 5, content: "", context: "home", slug: "" });
+  }
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
         <CardContent className="p-5 grid gap-2">
+          {form.id ? <div className="text-xs text-muted-foreground">Editando ID #{form.id}</div> : null}
           <Input placeholder="Autor" value={form.author} onChange={(e) => setForm({ ...form, author: e.target.value })} />
           <Input placeholder="Rating (1-5)" type="number" value={form.rating} onChange={(e) => setForm({ ...form, rating: Number(e.target.value) })} />
           <Input placeholder="Contexto (home/service/airport/station)" value={form.context} onChange={(e) => setForm({ ...form, context: e.target.value })} />
           <Input placeholder="Slug (opcional)" value={form.slug || ""} onChange={(e) => setForm({ ...form, slug: e.target.value })} />
           <Textarea placeholder="Contenido" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} />
-          <Button onClick={submit}>Guardar</Button>
+          <div className="flex gap-2">
+            <Button onClick={submit}>{form.id ? "Actualizar" : "Guardar"}</Button>
+            <Button variant="outline" onClick={resetForm}>Nuevo</Button>
+          </div>
         </CardContent>
       </Card>
       <div className="grid gap-3">
@@ -125,7 +135,10 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="font-medium">{r.author} · {r.rating}/5 · {r.context}{r.slug ? ` · ${r.slug}` : ""}</div>
-                <Button variant="outline" onClick={() => remove(r.id)}>Eliminar</Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => edit(r)}>Editar</Button>
+                  <Button variant="outline" onClick={() => remove(r.id)}>Eliminar</Button>
+                </div>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">{r.content}</p>
             </CardContent>
@@ -156,15 +169,25 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
     await fetch(`/api/admin/faqs?id=${id}`, { method: "DELETE", headers });
     load();
   }
+  function edit(f: Faq) {
+    setForm({ id: f.id, context: f.context, slug: f.slug, question: f.question, answer: f.answer });
+  }
+  function resetForm() {
+    setForm({ context: "service", slug: "", question: "", answer: "" });
+  }
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
         <CardContent className="p-5 grid gap-2">
+          {form.id ? <div className="text-xs text-muted-foreground">Editando ID #{form.id}</div> : null}
           <Input placeholder="Contexto (service/airport/station)" value={form.context} onChange={(e) => setForm({ ...form, context: e.target.value })} />
           <Input placeholder="Slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} />
           <Input placeholder="Pregunta" value={form.question} onChange={(e) => setForm({ ...form, question: e.target.value })} />
           <Textarea placeholder="Respuesta" value={form.answer} onChange={(e) => setForm({ ...form, answer: e.target.value })} />
-          <Button onClick={submit}>Guardar</Button>
+          <div className="flex gap-2">
+            <Button onClick={submit}>{form.id ? "Actualizar" : "Guardar"}</Button>
+            <Button variant="outline" onClick={resetForm}>Nuevo</Button>
+          </div>
         </CardContent>
       </Card>
       <div className="grid gap-3">
@@ -175,7 +198,10 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
                 <div className="font-medium">{f.context} · {f.slug}</div>
                 <div className="text-sm">{f.question}</div>
               </div>
-              <Button variant="outline" onClick={() => remove(f.id)}>Eliminar</Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => edit(f)}>Editar</Button>
+                <Button variant="outline" onClick={() => remove(f.id)}>Eliminar</Button>
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -360,6 +386,10 @@ function GalleryAdmin({ headers }: { headers: Record<string, string> }) {
     await fetch(`/api/admin/gallery?id=${id}`, { method: "DELETE", headers });
     load();
   }
+  async function update(it: GalleryRow) {
+    await fetch("/api/admin/gallery", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(it) });
+    load();
+  }
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
@@ -391,11 +421,19 @@ function GalleryAdmin({ headers }: { headers: Record<string, string> }) {
         </CardContent>
       </Card>
       <div className="grid gap-3">
-        {items.map((it) => (
-          <Card key={it.id}>
-            <CardContent className="p-4 flex items-center justify-between">
-              <div className="font-medium truncate max-w-[70%]">{it.url}</div>
-              <Button variant="outline" onClick={() => remove(it.id)}>Eliminar</Button>
+        {items.map((it, idx) => (
+          <Card key={it.id ?? idx}>
+            <CardContent className="p-4 grid gap-2">
+              <div className="text-sm truncate">{it.url}</div>
+              <div className="grid grid-cols-3 gap-2">
+                <Input placeholder="alt" value={it.alt || ""} onChange={(e) => setItems((arr) => arr.map((x, i) => i === idx ? { ...x, alt: e.target.value } : x))} />
+                <Input placeholder="posición" type="number" value={it.position ?? 0} onChange={(e) => setItems((arr) => arr.map((x, i) => i === idx ? { ...x, position: Number(e.target.value) } : x))} />
+                <Input placeholder="activa (true/false)" value={String(it.active ?? true)} onChange={(e) => setItems((arr) => arr.map((x, i) => i === idx ? { ...x, active: e.target.value === "true" } : x))} />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => remove(it.id)}>Eliminar</Button>
+                <Button onClick={() => update(it)}>Guardar</Button>
+              </div>
             </CardContent>
           </Card>
         ))}
