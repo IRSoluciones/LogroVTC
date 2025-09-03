@@ -303,7 +303,11 @@ function StationsAdmin({ headers }: { headers: Record<string, string> }) {
           <Input placeholder="slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} />
           <Input placeholder="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           <Input placeholder="city" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
-          <Input placeholder="type (tren/bus)" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} />
+          <Input
+            placeholder="type (tren/bus)"
+            value={form.type}
+            onChange={(e) => setForm({ ...form, type: e.target.value === "bus" ? "bus" : "tren" })}
+          />
           <Textarea placeholder="intro" value={form.intro} onChange={(e) => setForm({ ...form, intro: e.target.value })} />
           <Textarea placeholder="description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           <Input placeholder="keywords (coma)" value={form.keywords} onChange={(e) => setForm({ ...form, keywords: e.target.value })} />
