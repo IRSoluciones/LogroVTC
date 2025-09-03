@@ -28,7 +28,6 @@ import GenericModal from "@/components/ui/generic-modal";
 import Reveal from "@/components/visual/Reveal";
 import { airports, stations } from "@/lib/site-data";
 import Reviews from "@/components/sections/Reviews";
-import { isStrapiEnabled } from "@/lib/strapi";
 
 export default function HomePage() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);

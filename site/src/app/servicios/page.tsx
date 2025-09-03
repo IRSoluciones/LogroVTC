@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { services } from "@/lib/site-data";
-import { isStrapiEnabled, fetchServices } from "@/lib/strapi";
+import { listServices } from "@/lib/cms";
 import Reveal from "@/components/visual/Reveal";
 
 export const metadata: Metadata = {
@@ -15,16 +15,13 @@ export const metadata: Metadata = {
 };
 
 export default async function ServiciosIndexPage() {
-  const list = isStrapiEnabled
-    ? await (async () => {
-        try {
-          const json = await fetchServices();
-          return json.data.map((it) => it.attributes);
-        } catch (e) {
-          return services;
-        }
-      })()
-    : services;
+  const list = await (async () => {
+    try {
+      return await listServices();
+    } catch {
+      return services;
+    }
+  })();
   return (
     <main className="mx-auto max-w-6xl px-4 py-12">
       <Reveal>

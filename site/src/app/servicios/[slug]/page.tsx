@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { services, getServiceBySlug, airports, stations, type Service } from "@/lib/site-data";
-import { isStrapiEnabled, fetchServiceBySlug, fetchServices, type StrapiItem, type ServiceDto } from "@/lib/strapi";
+import { listServices, getServiceBySlugFromDb, getFaqs } from "@/lib/cms";
 import HeroWithForm from "@/components/sections/HeroWithForm";
 import ServicesNav from "@/components/sections/ServicesNav";
 import Reviews from "@/components/sections/Reviews";
@@ -19,35 +19,30 @@ type PageParams = Promise<{ slug: string }>;
 type PageProps = { params: PageParams };
 
 export async function generateStaticParams() {
-  if (isStrapiEnabled) {
-    try {
-      const json = await fetchServices();
-      return json.data.map((it: StrapiItem<ServiceDto>) => ({ slug: it.attributes.slug }));
-    } catch {}
-  }
+  try {
+    const list = await listServices();
+    if (list.length > 0) return list.map((it) => ({ slug: it.slug }));
+  } catch {}
   return services.map((s) => ({ slug: s.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  if (isStrapiEnabled) {
-    try {
-      const item = await fetchServiceBySlug(slug);
-      const s = item?.attributes;
-      if (s) {
-        const title = `${s.name} | LogroVTC`;
-        const description = s.description;
-        const url = `https://logro-vtc.vercel.app/servicios/${slug}`;
-        return {
-          title,
-          description,
-          alternates: { canonical: url },
-          openGraph: { title, description, url, type: "article", locale: "es_ES" },
-          keywords: s.keywords,
-        };
-      }
-    } catch {}
-  }
+  try {
+    const s = await getServiceBySlugFromDb(slug);
+    if (s) {
+      const title = `${s.name} | LogroVTC`;
+      const description = s.description;
+      const url = `https://logro-vtc.vercel.app/servicios/${slug}`;
+      return {
+        title,
+        description,
+        alternates: { canonical: url },
+        openGraph: { title, description, url, type: "article", locale: "es_ES" },
+        keywords: s.keywords || undefined,
+      };
+    }
+  } catch {}
   const service = getServiceBySlug(slug);
   if (!service) return {};
   const title = `${service.name} | LogroVTC`;
@@ -65,23 +60,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function ServicePage({ params }: PageProps) {
   const { slug } = await params;
   let service: Service | undefined = getServiceBySlug(slug);
-  if (isStrapiEnabled) {
-    try {
-      const item = await fetchServiceBySlug(slug);
-      const s = item?.attributes;
-      if (s) {
-        service = {
-          slug: slug as Service["slug"],
-          name: s.name,
-          title: s.title,
-          description: s.description,
-          intro: s.intro,
-          benefits: s.benefits ?? [],
-          keywords: s.keywords ?? [],
-        };
-      }
-    } catch {}
-  }
+  try {
+    const s = await getServiceBySlugFromDb(slug);
+    if (s) {
+      service = {
+        slug: slug as Service["slug"],
+        name: s.name,
+        title: s.title,
+        description: s.description,
+        intro: s.intro,
+        benefits: s.benefits ?? [],
+        keywords: s.keywords ?? [],
+      };
+    }
+  } catch {}
   if (!service) return notFound();
 
   return (
@@ -193,18 +185,13 @@ function getServiceFaqs(slug: string) {
   ];
 }
 
-// FAQs dinámicas desde Strapi con fallback
-import { fetchFaqsBy } from "@/lib/strapi";
-
 async function ServiceFaqs({ slug }: { slug: string }) {
   let items = getServiceFaqs(slug);
-  if (isStrapiEnabled) {
-    try {
-      const json = await fetchFaqsBy("service", slug);
-      const list = json.data.map((it) => ({ q: it.attributes.question, a: it.attributes.answer }));
-      if (list.length > 0) items = list;
-    } catch {}
-  }
+  try {
+    const list = await getFaqs("service", slug);
+    const mapped = list.map((it) => ({ q: it.question, a: it.answer }));
+    if (mapped.length > 0) items = mapped;
+  } catch {}
   return <FAQs items={items} />;
 }
 

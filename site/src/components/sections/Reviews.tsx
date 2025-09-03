@@ -1,24 +1,27 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { isStrapiEnabled, fetchReviewsBy, fetchReviews, type ReviewDto } from "@/lib/strapi";
 
 type ReviewsProps = {
   context?: "home" | "service" | "airport" | "station";
   slug?: string;
 };
 
-export default async function Reviews({ context = "home", slug }: ReviewsProps) {
-  let reviews: ReviewDto[] = [];
-  if (isStrapiEnabled) {
-    try {
-      const byCtx = await fetchReviewsBy(context, slug);
-      reviews = byCtx.data.map((it) => ({ ...it.attributes }));
-      // Si no hay reviews con contexto/slug (entradas antiguas sin campo), intentamos sin filtro
-      if (reviews.length === 0) {
-        const all = await fetchReviews();
-        reviews = all.data.map((it) => ({ ...it.attributes }));
-      }
-    } catch {}
-  }
+type ReviewItem = { author?: string; rating?: number; content?: string; featured?: boolean };
+
+export default function Reviews({ context = "home", slug }: ReviewsProps) {
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
+
+  useEffect(() => {
+    const url = `/api/public/reviews?context=${encodeURIComponent(context)}${slug ? `&slug=${encodeURIComponent(slug)}` : ""}`;
+    fetch(url)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((json) => {
+        if (json?.ok && Array.isArray(json.reviews)) setReviews(json.reviews);
+      })
+      .catch(() => {});
+  }, [context, slug]);
 
   return (
     <section id="opiniones" className="mt-24">

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { airports } from "@/lib/site-data";
-import { isStrapiEnabled, fetchAirports } from "@/lib/strapi";
+import { listAirports } from "@/lib/cms";
 import Reveal from "@/components/visual/Reveal";
 
 export const metadata: Metadata = {
@@ -15,16 +15,13 @@ export const metadata: Metadata = {
 };
 
 export default async function AeropuertosIndexPage() {
-  const list = isStrapiEnabled
-    ? await (async () => {
-        try {
-          const json = await fetchAirports();
-          return json.data.map((it) => it.attributes);
-        } catch (e) {
-          return airports;
-        }
-      })()
-    : airports;
+  const list = await (async () => {
+    try {
+      return await listAirports();
+    } catch {
+      return airports;
+    }
+  })();
   return (
     <main className="mx-auto max-w-6xl px-4 py-12">
       <Reveal>
