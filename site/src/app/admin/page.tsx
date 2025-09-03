@@ -196,8 +196,8 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
             max={5}
             step={1}
             value={form.rating}
-            onChange={(e) => {
-              const n = Number(e.target.value);
+            onChange={(ev) => {
+              const n = Number(ev.target.value);
               const clamped = Number.isFinite(n) ? Math.max(1, Math.min(5, n)) : 5;
               setForm({ ...form, rating: clamped });
             }}
@@ -205,15 +205,19 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
           <select
             className="h-10 rounded-md border border-input px-3 text-sm bg-background"
             value={form.context || "home"}
-            onChange={(e) => setForm({ ...form, context: e.target.value })}
+            onChange={(e) => setForm({ ...form, context: e.target.value as "home" | "service" | "airport" | "station", slug: e.target.value === "home" ? "" : form.slug })}
           >
             <option value="home">Inicio (home)</option>
-            <option value="service">Servicio (service)</option>
-            <option value="airport">Aeropuerto (airport)</option>
-            <option value="station">Estación (station)</option>
+            <option value="service">Servicios (camino, mensajería, aeropuerto)</option>
+            <option value="airport">Transporte Aeropuerto (todas las subpáginas)</option>
+            <option value="station">Estaciones</option>
           </select>
           {form.context && form.context !== "home" ? (
-            <Input placeholder="Slug del recurso (opcional)" value={form.slug || ""} onChange={(e) => setForm({ ...form, slug: e.target.value })} />
+            <Input
+              placeholder={form.context === "service" ? "Slug del servicio (camino | mensajeria | aeropuerto)" : form.context === "airport" ? "Slug del aeropuerto (opcional para concreto)" : "Slug de estación (opcional)"}
+              value={form.slug || ""}
+              onChange={(e) => setForm({ ...form, slug: e.target.value })}
+            />
           ) : null}
           <Textarea placeholder="Contenido" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} />
           <div className="flex gap-2">

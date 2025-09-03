@@ -63,7 +63,11 @@ export async function getReviews(context?: Review["context"], slug?: string) {
   const client = supabasePublic();
   let query = client.from("reviews").select("*").order("id", { ascending: true });
   if (context) query = query.eq("context", context);
-  if (slug) query = query.eq("slug", slug);
+  // Si se pasa slug, incluimos registros globales (slug NULL) además de los específicos
+  if (slug) {
+    // Supabase .or usa una cadena con filtros separados por comas
+    query = query.or(`slug.is.null,slug.eq.${slug}`);
+  }
   const { data, error } = await query;
   if (error) throw error;
   return (data || []) as Review[];
