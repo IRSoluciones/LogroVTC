@@ -337,6 +337,19 @@ function GalleryAdmin({ headers }: { headers: Record<string, string> }) {
     if (json.ok) setItems(json.images as GalleryRow[]);
   }, [headers]);
   useEffect(() => { void load(); }, [load]);
+  const [dragOver, setDragOver] = useState(false);
+
+  async function onDropFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    const fd = new FormData();
+    Array.from(files).forEach((f) => fd.append("file", f));
+    fd.append("alt", form.alt);
+    fd.append("position", String(form.position));
+    fd.append("active", String(form.active));
+    await fetch("/api/admin/gallery/upload", { method: "POST", headers: { ...headers }, body: fd as any });
+    setForm({ url: "", alt: "", position: 0, active: true });
+    void load();
+  }
   async function submit() {
     await fetch("/api/admin/gallery", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(form) });
     setForm({ url: "", alt: "", position: 0, active: true });
@@ -351,11 +364,30 @@ function GalleryAdmin({ headers }: { headers: Record<string, string> }) {
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
         <CardContent className="p-5 grid gap-2">
-          <Input placeholder="url" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} />
-          <Input placeholder="alt" value={form.alt} onChange={(e) => setForm({ ...form, alt: e.target.value })} />
-          <Input placeholder="position" type="number" value={form.position} onChange={(e) => setForm({ ...form, position: Number(e.target.value) })} />
-          <Input placeholder="active (true/false)" value={String(form.active)} onChange={(e) => setForm({ ...form, active: e.target.value === "true" })} />
-          <Button onClick={submit}>Guardar</Button>
+          <div
+            className={`border-2 border-dashed rounded-md p-6 text-center ${dragOver ? "border-primary bg-primary/5" : "border-border"}`}
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={(e) => { e.preventDefault(); setDragOver(false); onDropFiles(e.dataTransfer.files); }}
+          >
+            <p className="text-sm text-muted-foreground">Arrastra y suelta imágenes aquí o</p>
+            <div className="mt-2">
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={(e) => onDropFiles(e.target.files)}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 mt-3">
+            <Input placeholder="alt" value={form.alt} onChange={(e) => setForm({ ...form, alt: e.target.value })} />
+            <Input placeholder="posición" type="number" value={form.position} onChange={(e) => setForm({ ...form, position: Number(e.target.value) })} />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Input placeholder="activa (true/false)" value={String(form.active)} onChange={(e) => setForm({ ...form, active: e.target.value === "true" })} />
+            <Button variant="outline" onClick={() => setForm({ url: "", alt: "", position: 0, active: true })}>Limpiar</Button>
+          </div>
         </CardContent>
       </Card>
       <div className="grid gap-3">
