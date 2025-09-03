@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, User, Database, Eye, Lock, Calendar, Phone, Mail, MapPin, FileText } from "lucide-react";
+import { Shield, User, Database, Eye, Lock, Calendar, Phone, Mail, MapPin } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Política de Privacidad | LogroVTC",

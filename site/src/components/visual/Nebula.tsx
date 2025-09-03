@@ -23,7 +23,7 @@ export default function Nebula({ className, triggerId = "inicio", intensity = 1 
     const el = rootRef.current;
     if (!el) return;
 
-    const blobs = [b1.current, b2.current, b3.current, b4.current].filter(Boolean) as HTMLSpanElement[];
+    // Nota: blobs calculado previamente no se usa directamente, lo omitimos para evitar warnings.
 
     const onMove = (e: MouseEvent) => {
       const rect = el.getBoundingClientRect();

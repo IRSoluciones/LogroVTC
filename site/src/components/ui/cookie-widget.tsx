@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "./button";
-import { Settings, Cookie, X } from "lucide-react";
+import { Cookie } from "lucide-react";
 import CookieManager from "./cookie-manager";
 import { useCookies } from "@/lib/hooks/useCookies";
 

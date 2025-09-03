@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { Button } from "./button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./dialog";
-import { Settings, Cookie, Shield, Info } from "lucide-react";
+import { Settings, Cookie } from "lucide-react";
 import { useCookies } from "@/lib/hooks/useCookies";
 
 type CookieManagerProps = {
