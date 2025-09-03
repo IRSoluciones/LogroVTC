@@ -28,6 +28,7 @@ export default function AdminPage() {
     if (token) h.Authorization = `Bearer ${token}`;
     return h;
   }, [token]);
+  const [active, setActive] = useState<"services" | "airports" | "stations" | "reviews" | "faqs" | "gallery">("services");
 
   useEffect(() => {
     const saved = localStorage.getItem("admin_token");
@@ -53,36 +54,60 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10 grid gap-8">
-      <section>
-        <h2 className="text-xl font-semibold">Servicios</h2>
-        <ServicesAdmin headers={headers} />
-      </section>
+    <main className="mx-auto max-w-6xl px-4 py-8 grid gap-6">
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/50 border-b py-3">
+        <div className="flex flex-wrap gap-2">
+          {([
+            { key: "services", label: "Servicios" },
+            { key: "airports", label: "Aeropuertos" },
+            { key: "stations", label: "Estaciones" },
+            { key: "gallery", label: "Galería" },
+            { key: "reviews", label: "Reviews" },
+            { key: "faqs", label: "FAQs" },
+          ] as const).map(({ key, label }) => (
+            <Button key={key} variant={active === key ? "default" : "outline"} onClick={() => setActive(key)}>
+              {label}
+            </Button>
+          ))}
+        </div>
+      </div>
 
-      <section>
-        <h2 className="text-xl font-semibold">Aeropuertos</h2>
-        <AirportsAdmin headers={headers} />
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold">Estaciones</h2>
-        <StationsAdmin headers={headers} />
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold">Galería</h2>
-        <GalleryAdmin headers={headers} />
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold">Reviews</h2>
-        <ReviewsAdmin headers={headers} />
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold">FAQs</h2>
-        <FaqsAdmin headers={headers} />
-      </section>
+      {active === "services" && (
+        <section>
+          <h2 className="text-xl font-semibold mb-2">Servicios</h2>
+          <ServicesAdmin headers={headers} />
+        </section>
+      )}
+      {active === "airports" && (
+        <section>
+          <h2 className="text-xl font-semibold mb-2">Aeropuertos</h2>
+          <AirportsAdmin headers={headers} />
+        </section>
+      )}
+      {active === "stations" && (
+        <section>
+          <h2 className="text-xl font-semibold mb-2">Estaciones</h2>
+          <StationsAdmin headers={headers} />
+        </section>
+      )}
+      {active === "gallery" && (
+        <section>
+          <h2 className="text-xl font-semibold mb-2">Galería</h2>
+          <GalleryAdmin headers={headers} />
+        </section>
+      )}
+      {active === "reviews" && (
+        <section>
+          <h2 className="text-xl font-semibold mb-2">Reviews</h2>
+          <ReviewsAdmin headers={headers} />
+        </section>
+      )}
+      {active === "faqs" && (
+        <section>
+          <h2 className="text-xl font-semibold mb-2">FAQs</h2>
+          <FaqsAdmin headers={headers} />
+        </section>
+      )}
     </main>
   );
 }
