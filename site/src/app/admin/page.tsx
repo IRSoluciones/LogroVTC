@@ -154,12 +154,32 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
   const [form, setForm] = useState<Review>({ author: "", rating: 5, content: "", context: "home", slug: "" });
   const [notice, setNotice] = useState<string>("");
   const { toast } = useToast();
+  // opciones para selects de slug
+  const [serviceOptions, setServiceOptions] = useState<{ slug: string; name: string }[]>([]);
+  const [airportOptions, setAirportOptions] = useState<{ slug: string; name: string }[]>([]);
+  const [stationOptions, setStationOptions] = useState<{ slug: string; name: string }[]>([]);
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/reviews", { headers });
     const json = await res.json();
     if (json.ok) setItems(json.reviews);
   }, [headers]);
   useEffect(() => { void load(); }, [load]);
+  // cargar opciones para selects
+  const loadOptions = useCallback(async () => {
+    try {
+      const [s, a, t] = await Promise.all([
+        fetch("/api/admin/services", { headers }).then((r) => r.json()),
+        fetch("/api/admin/aeropuertos", { headers }).then((r) => r.json()),
+        fetch("/api/admin/estaciones", { headers }).then((r) => r.json()),
+      ]);
+      if (s?.ok) setServiceOptions((s.services || []).map((x: { slug: string; name: string }) => ({ slug: x.slug, name: x.name })));
+      if (a?.ok) setAirportOptions((a.airports || []).map((x: { slug: string; name: string }) => ({ slug: x.slug, name: x.name })));
+      if (t?.ok) setStationOptions((t.stations || []).map((x: { slug: string; name: string }) => ({ slug: x.slug, name: x.name })));
+    } catch {
+      // ignore
+    }
+  }, [headers]);
+  useEffect(() => { void loadOptions(); }, [loadOptions]);
 
   async function submit() {
     const resp = await fetch("/api/admin/reviews", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(form) });
@@ -213,11 +233,31 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
             <option value="station">Estaciones</option>
           </select>
           {form.context && form.context !== "home" ? (
-            <Input
-              placeholder={form.context === "service" ? "Slug del servicio (camino | mensajeria | aeropuerto)" : form.context === "airport" ? "Slug del aeropuerto (opcional para concreto)" : "Slug de estación (opcional)"}
-              value={form.slug || ""}
-              onChange={(e) => setForm({ ...form, slug: e.target.value })}
-            />
+            <div className="grid gap-1">
+              <label className="text-xs text-muted-foreground">
+                {form.context === "service"
+                  ? "Servicio"
+                  : form.context === "airport"
+                  ? "Aeropuerto (vacío = todos)"
+                  : "Estación (vacío = todas)"}
+              </label>
+              <select
+                className="h-10 rounded-md border border-input px-3 text-sm bg-background"
+                value={form.slug || ""}
+                onChange={(e) => setForm({ ...form, slug: e.target.value })}
+              >
+                <option value="">{form.context === "service" ? "Selecciona un servicio" : "Todas"}</option>
+                {form.context === "service" && serviceOptions.map((o) => (
+                  <option key={o.slug} value={o.slug}>{o.name || o.slug}</option>
+                ))}
+                {form.context === "airport" && airportOptions.map((o) => (
+                  <option key={o.slug} value={o.slug}>{o.name || o.slug}</option>
+                ))}
+                {form.context === "station" && stationOptions.map((o) => (
+                  <option key={o.slug} value={o.slug}>{o.name || o.slug}</option>
+                ))}
+              </select>
+            </div>
           ) : null}
           <Textarea placeholder="Contenido" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} />
           <div className="flex gap-2">
@@ -227,21 +267,41 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
         </CardContent>
       </Card>
       <div className="grid gap-3">
-        {items.length === 0 && <div className="text-sm text-muted-foreground">No hay reviews publicadas.</div>}
-        {items.map((r) => (
-          <Card key={r.id}>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="font-medium">{r.author} · {r.rating}/5 · {r.context}{r.slug ? ` · ${r.slug}` : ""}</div>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => edit(r)}>Editar</Button>
-                  <Button variant="outline" onClick={() => remove(r.id)}>Eliminar</Button>
-                </div>
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">{r.content}</p>
-            </CardContent>
-          </Card>
-        ))}
+        {items.length === 0 ? (
+          <div className="text-sm text-muted-foreground">No hay reviews publicadas.</div>
+        ) : (
+          <div className="overflow-x-auto rounded-lg border">
+            <table className="min-w-full text-sm">
+              <thead className="bg-muted/50 text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2 text-left">Autor</th>
+                  <th className="px-3 py-2 text-left">Puntuación</th>
+                  <th className="px-3 py-2 text-left">Contexto</th>
+                  <th className="px-3 py-2 text-left">Slug</th>
+                  <th className="px-3 py-2 text-left">Contenido</th>
+                  <th className="px-3 py-2 text-left">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((r) => (
+                  <tr key={r.id} className="border-t">
+                    <td className="px-3 py-2 align-top font-medium">{r.author}</td>
+                    <td className="px-3 py-2 align-top">{r.rating}/5</td>
+                    <td className="px-3 py-2 align-top">{r.context}</td>
+                    <td className="px-3 py-2 align-top">{r.slug || "—"}</td>
+                    <td className="px-3 py-2 align-top max-w-[28rem]">{r.content}</td>
+                    <td className="px-3 py-2 align-top">
+                      <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => edit(r)}>Editar</Button>
+                        <Button variant="outline" onClick={() => remove(r.id)}>Eliminar</Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
