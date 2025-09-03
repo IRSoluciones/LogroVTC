@@ -6,10 +6,9 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "**.strapiapp.com" },
-      { protocol: "https", hostname: "**.railway.app" },
-      { protocol: "https", hostname: "**.onrender.com" },
-      { protocol: "http", hostname: "localhost", port: "1337" },
+      { protocol: "https", hostname: "**.supabase.co" },
+      { protocol: "https", hostname: "**.supabase.in" },
+      { protocol: "https", hostname: "**.vercel.app" },
     ],
   },
 };
