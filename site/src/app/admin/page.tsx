@@ -58,6 +58,7 @@ export default function AdminPage() {
   return (
     <ToastProvider>
     <main className="mx-auto max-w-6xl px-4 py-8 grid gap-6">
+      <SeedControls headers={headers} />
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/50 border-b py-3">
         <div className="flex flex-wrap gap-2">
           {([
@@ -113,6 +114,38 @@ export default function AdminPage() {
       )}
     </main>
     </ToastProvider>
+  );
+}
+
+function SeedControls({ headers }: { headers: Record<string, string> }) {
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState<string>("");
+  async function runAll() {
+    setLoading(true);
+    setMsg("");
+    try {
+      const a = await fetch("/api/admin/seed", { method: "POST", headers });
+      const b = await fetch("/api/admin/seed/gallery", { method: "POST", headers });
+      if (a.ok && b.ok) {
+        setMsg("Contenido poblado correctamente.");
+        setTimeout(() => location.reload(), 800);
+      } else {
+        setMsg("Alguna operación falló. Revisa variables y permisos.");
+      }
+    } catch (e) {
+      setMsg("Error al poblar. Prueba de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  }
+  return (
+    <section className="border rounded-md p-3 bg-card/50">
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-sm text-muted-foreground">Poblar contenido base (services, airports, stations, reviews, faqs y galería).</div>
+        <Button onClick={runAll} disabled={loading}>{loading ? "Cargando…" : "Poblar contenido"}</Button>
+      </div>
+      {msg && <div className="mt-2 text-xs text-muted-foreground">{msg}</div>}
+    </section>
   );
 }
 
