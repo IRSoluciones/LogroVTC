@@ -468,6 +468,12 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
 function ServicesAdmin({ headers }: { headers: Record<string, string> }) {
   const [items, setItems] = useState<ServiceRow[]>([]);
   const [form, setForm] = useState<ServiceForm>({ slug: "", name: "", title: "", description: "", intro: "", keywords: "" });
+  // búsqueda/paginación/orden
+  const [query, setQuery] = useState<string>("");
+  const [page, setPage] = useState<number>(0);
+  const pageSize = 10;
+  const [sortKey, setSortKey] = useState<"slug" | "name">("slug");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/services", { headers });
     const json = await res.json();
@@ -497,6 +503,28 @@ function ServicesAdmin({ headers }: { headers: Record<string, string> }) {
   function resetForm() {
     setForm({ slug: "", name: "", title: "", description: "", intro: "", keywords: "" });
   }
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return q
+      ? items.filter((it) => [it.slug, it.name, it.title].some((v) => (v || "").toLowerCase().includes(q)))
+      : items;
+  }, [items, query]);
+  const sorted = useMemo(() => {
+    const arr = [...filtered];
+    arr.sort((a, b) => {
+      const va = a[sortKey];
+      const vb = b[sortKey];
+      const cmp = String(va).localeCompare(String(vb));
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+    return arr;
+  }, [filtered, sortKey, sortDir]);
+  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+  const pageItems = useMemo(() => sorted.slice(page * pageSize, page * pageSize + pageSize), [sorted, page]);
+  function onSort(col: "slug" | "name") {
+    if (sortKey === col) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(col); setSortDir("asc"); }
+  }
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
@@ -514,17 +542,25 @@ function ServicesAdmin({ headers }: { headers: Record<string, string> }) {
         </CardContent>
       </Card>
       <div className="grid gap-3">
+        <div className="flex items-center justify-between">
+          <Input className="max-w-xs" placeholder="Buscar..." value={query} onChange={(e) => { setQuery(e.target.value); setPage(0); }} />
+          <div className="text-xs text-muted-foreground">{sorted.length} resultados</div>
+        </div>
         <div className="rounded-lg border overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 text-left">Slug</th>
-                <th className="px-3 py-2 text-left">Nombre</th>
+                <th className="px-3 py-2 text-left">
+                  <button className="inline-flex items-center gap-1" onClick={() => onSort("slug")}>Slug {sortKey === "slug" ? (sortDir === "asc" ? "▲" : "▼") : ""}</button>
+                </th>
+                <th className="px-3 py-2 text-left">
+                  <button className="inline-flex items-center gap-1" onClick={() => onSort("name")}>Nombre {sortKey === "name" ? (sortDir === "asc" ? "▲" : "▼") : ""}</button>
+                </th>
                 <th className="px-3 py-2 text-left">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {items.map((it) => (
+              {pageItems.map((it) => (
                 <tr key={it.slug} className="border-t">
                   <td className="px-3 py-2 align-top">{it.slug}</td>
                   <td className="px-3 py-2 align-top">{it.name}</td>
@@ -538,6 +574,11 @@ function ServicesAdmin({ headers }: { headers: Record<string, string> }) {
               ))}
             </tbody>
           </table>
+          <div className="flex items-center justify-end gap-2 p-2 border-t">
+            <Button variant="outline" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0}>Anterior</Button>
+            <div className="text-xs text-muted-foreground">Página {page + 1} / {totalPages}</div>
+            <Button variant="outline" onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}>Siguiente</Button>
+          </div>
         </div>
       </div>
     </div>
@@ -547,6 +588,11 @@ function ServicesAdmin({ headers }: { headers: Record<string, string> }) {
 function AirportsAdmin({ headers }: { headers: Record<string, string> }) {
   const [items, setItems] = useState<AirportRow[]>([]);
   const [form, setForm] = useState<AirportForm>({ slug: "", name: "", city: "", code: "", intro: "", description: "", keywords: "" });
+  const [query, setQuery] = useState<string>("");
+  const [page, setPage] = useState<number>(0);
+  const pageSize = 10;
+  const [sortKey, setSortKey] = useState<"slug" | "name" | "city">("slug");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/aeropuertos", { headers });
     const json = await res.json();
@@ -577,6 +623,28 @@ function AirportsAdmin({ headers }: { headers: Record<string, string> }) {
   function resetForm() {
     setForm({ slug: "", name: "", city: "", code: "", intro: "", description: "", keywords: "" });
   }
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return q
+      ? items.filter((it) => [it.slug, it.name, it.city, it.code].some((v) => (v || "").toLowerCase().includes(q)))
+      : items;
+  }, [items, query]);
+  const sorted = useMemo(() => {
+    const arr = [...filtered];
+    arr.sort((a, b) => {
+      const va = String(a[sortKey] || "");
+      const vb = String(b[sortKey] || "");
+      const cmp = va.localeCompare(vb);
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+    return arr;
+  }, [filtered, sortKey, sortDir]);
+  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+  const pageItems = useMemo(() => sorted.slice(page * pageSize, page * pageSize + pageSize), [sorted, page]);
+  function onSort(col: "slug" | "name" | "city") {
+    if (sortKey === col) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(col); setSortDir("asc"); }
+  }
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
@@ -595,17 +663,21 @@ function AirportsAdmin({ headers }: { headers: Record<string, string> }) {
         </CardContent>
       </Card>
       <div className="grid gap-3">
+        <div className="flex items-center justify-between">
+          <Input className="max-w-xs" placeholder="Buscar..." value={query} onChange={(e) => { setQuery(e.target.value); setPage(0); }} />
+          <div className="text-xs text-muted-foreground">{sorted.length} resultados</div>
+        </div>
         <div className="rounded-lg border overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 text-left">Slug</th>
-                <th className="px-3 py-2 text-left">Nombre</th>
+                <th className="px-3 py-2 text-left"><button className="inline-flex items-center gap-1" onClick={() => onSort("slug")}>Slug {sortKey === "slug" ? (sortDir === "asc" ? "▲" : "▼") : ""}</button></th>
+                <th className="px-3 py-2 text-left"><button className="inline-flex items-center gap-1" onClick={() => onSort("name")}>Nombre {sortKey === "name" ? (sortDir === "asc" ? "▲" : "▼") : ""}</button></th>
                 <th className="px-3 py-2 text-left">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {items.map((it) => (
+              {pageItems.map((it) => (
                 <tr key={it.slug} className="border-t">
                   <td className="px-3 py-2 align-top">{it.slug}</td>
                   <td className="px-3 py-2 align-top">{it.name}</td>
@@ -619,6 +691,11 @@ function AirportsAdmin({ headers }: { headers: Record<string, string> }) {
               ))}
             </tbody>
           </table>
+          <div className="flex items-center justify-end gap-2 p-2 border-t">
+            <Button variant="outline" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0}>Anterior</Button>
+            <div className="text-xs text-muted-foreground">Página {page + 1} / {totalPages}</div>
+            <Button variant="outline" onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}>Siguiente</Button>
+          </div>
         </div>
       </div>
     </div>
@@ -628,6 +705,11 @@ function AirportsAdmin({ headers }: { headers: Record<string, string> }) {
 function StationsAdmin({ headers }: { headers: Record<string, string> }) {
   const [items, setItems] = useState<StationRow[]>([]);
   const [form, setForm] = useState<StationForm>({ slug: "", name: "", city: "", type: "tren", intro: "", description: "", keywords: "" });
+  const [query, setQuery] = useState<string>("");
+  const [page, setPage] = useState<number>(0);
+  const pageSize = 10;
+  const [sortKey, setSortKey] = useState<"slug" | "name" | "city">("slug");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/estaciones", { headers });
     const json = await res.json();
@@ -658,6 +740,28 @@ function StationsAdmin({ headers }: { headers: Record<string, string> }) {
   function resetForm() {
     setForm({ slug: "", name: "", city: "", type: "tren", intro: "", description: "", keywords: "" });
   }
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return q
+      ? items.filter((it) => [it.slug, it.name, it.city, it.type].some((v) => (v || "").toLowerCase().includes(q)))
+      : items;
+  }, [items, query]);
+  const sorted = useMemo(() => {
+    const arr = [...filtered];
+    arr.sort((a, b) => {
+      const va = String((sortKey === "city" ? a.city : sortKey === "name" ? a.name : a.slug) || "");
+      const vb = String((sortKey === "city" ? b.city : sortKey === "name" ? b.name : b.slug) || "");
+      const cmp = va.localeCompare(vb);
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+    return arr;
+  }, [filtered, sortKey, sortDir]);
+  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+  const pageItems = useMemo(() => sorted.slice(page * pageSize, page * pageSize + pageSize), [sorted, page]);
+  function onSort(col: "slug" | "name" | "city") {
+    if (sortKey === col) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(col); setSortDir("asc"); }
+  }
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
@@ -680,17 +784,21 @@ function StationsAdmin({ headers }: { headers: Record<string, string> }) {
         </CardContent>
       </Card>
       <div className="grid gap-3">
+        <div className="flex items-center justify-between">
+          <Input className="max-w-xs" placeholder="Buscar..." value={query} onChange={(e) => { setQuery(e.target.value); setPage(0); }} />
+          <div className="text-xs text-muted-foreground">{sorted.length} resultados</div>
+        </div>
         <div className="rounded-lg border overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 text-left">Slug</th>
-                <th className="px-3 py-2 text-left">Nombre</th>
+                <th className="px-3 py-2 text-left"><button className="inline-flex items-center gap-1" onClick={() => onSort("slug")}>Slug {sortKey === "slug" ? (sortDir === "asc" ? "▲" : "▼") : ""}</button></th>
+                <th className="px-3 py-2 text-left"><button className="inline-flex items-center gap-1" onClick={() => onSort("name")}>Nombre {sortKey === "name" ? (sortDir === "asc" ? "▲" : "▼") : ""}</button></th>
                 <th className="px-3 py-2 text-left">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {items.map((it) => (
+              {pageItems.map((it) => (
                 <tr key={it.slug} className="border-t">
                   <td className="px-3 py-2 align-top">{it.slug}</td>
                   <td className="px-3 py-2 align-top">{it.name}</td>
@@ -704,6 +812,11 @@ function StationsAdmin({ headers }: { headers: Record<string, string> }) {
               ))}
             </tbody>
           </table>
+          <div className="flex items-center justify-end gap-2 p-2 border-t">
+            <Button variant="outline" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0}>Anterior</Button>
+            <div className="text-xs text-muted-foreground">Página {page + 1} / {totalPages}</div>
+            <Button variant="outline" onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}>Siguiente</Button>
+          </div>
         </div>
       </div>
     </div>
