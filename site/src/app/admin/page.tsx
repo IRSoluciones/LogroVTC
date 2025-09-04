@@ -2,10 +2,26 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { ToastProvider, useToast } from "@/components/ui/toast";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+
+// Utilidades compartidas para exportación CSV
+function escapeCsvGlobal(value: string): string {
+  return '"' + value.replaceAll('"', '""') + '"';
+}
+
+function downloadCSVGlobal(csv: string, filename: string) {
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 type Review = { id?: number; author: string; rating: number; content?: string; featured?: boolean; context?: string; slug?: string };
 type Faq = { id?: number; context: string; slug: string; question: string; answer: string };
@@ -161,6 +177,7 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
   // filtros y selección múltiple
   const [filter, setFilter] = useState<"all" | "home" | "service" | "airport" | "station">("all");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/reviews", { headers });
     const json = await res.json();
@@ -189,6 +206,7 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
     () => displayItems.length > 0 && displayItems.every((r) => (r.id ? selectedIds.includes(r.id) : true)),
     [displayItems, selectedIds]
   );
+  // CSV helpers: usa funciones globales
 
   function toggleRow(id?: number) {
     if (!id) return;
@@ -199,11 +217,14 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
     if (ids.length === 0) return;
     setSelectedIds((prev) => (ids.every((id) => prev.includes(id)) ? prev.filter((id) => !ids.includes(id)) : Array.from(new Set([...prev, ...ids]))));
   }
-  async function removeSelected() {
+  async function confirmRemoveSelected() {
     if (selectedIds.length === 0) return;
-    if (!confirm(`¿Eliminar ${selectedIds.length} reviews seleccionadas?`)) return;
+    setConfirmOpen(true);
+  }
+  async function removeSelected() {
     await Promise.all(selectedIds.map((id) => fetch(`/api/admin/reviews?id=${id}`, { method: "DELETE", headers })));
     setSelectedIds([]);
+    setConfirmOpen(false);
     toast("Reviews eliminadas", "success");
     load();
   }
@@ -310,7 +331,16 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
           </div>
           <div className="flex items-center gap-2">
             {selectedIds.length > 0 && (
-              <Button variant="destructive" onClick={removeSelected}>Eliminar seleccionados</Button>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={() => {
+                  const rows = displayItems.filter((r) => r.id && selectedIds.includes(r.id));
+                  const headersCsv = ["author","rating","context","slug","content"];
+                  const lines = rows.map((r) => [escapeCsvGlobal(r.author), r.rating, r.context || "", r.slug || "", escapeCsvGlobal(r.content || "")].join(","));
+                  const csv = [headersCsv.join(","), ...lines].join("\n");
+                  downloadCSVGlobal(csv, `reviews_${Date.now()}.csv`);
+                }}>Exportar CSV</Button>
+                <Button variant="destructive" onClick={confirmRemoveSelected}>Eliminar seleccionados</Button>
+              </div>
             )}
           </div>
         </div>
@@ -353,6 +383,16 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
             </table>
           </div>
         )}
+        <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <DialogContent className="w-[420px]">
+            <div className="px-6 py-4 border-b"><DialogTitle>Eliminar {selectedIds.length} reviews</DialogTitle></div>
+            <div className="p-6 text-sm text-muted-foreground">Esta acción no se puede deshacer.</div>
+            <div className="flex justify-end gap-2 px-6 pb-4">
+              <Button variant="outline" onClick={() => setConfirmOpen(false)}>Cancelar</Button>
+              <Button variant="destructive" onClick={removeSelected}>Eliminar</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
@@ -410,6 +450,7 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
     () => pageItems.length > 0 && pageItems.every((f) => (f.id ? selectedIds.includes(f.id) : true)),
     [pageItems, selectedIds]
   );
+  const [confirmOpen, setConfirmOpen] = useState(false);
   function toggleRow(id?: number) {
     if (!id) return;
     setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -419,11 +460,14 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
     if (ids.length === 0) return;
     setSelectedIds((prev) => (ids.every((id) => prev.includes(id)) ? prev.filter((id) => !ids.includes(id)) : Array.from(new Set([...prev, ...ids]))));
   }
-  async function removeSelected() {
+  function confirmRemoveSelected() {
     if (selectedIds.length === 0) return;
-    if (!confirm(`¿Eliminar ${selectedIds.length} FAQs seleccionadas?`)) return;
+    setConfirmOpen(true);
+  }
+  async function removeSelected() {
     await Promise.all(selectedIds.map((id) => fetch(`/api/admin/faqs?id=${id}`, { method: "DELETE", headers })));
     setSelectedIds([]);
+    setConfirmOpen(false);
     toast("FAQs eliminadas", "success");
     load();
   }
@@ -507,11 +551,20 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
               </Button>
             ))}
           </div>
-          <Input className="max-w-xs" placeholder="Buscar..." value={query} onChange={(e) => { setQuery(e.target.value); setPage(0); }} />
           <div className="flex items-center gap-2">
+            <Input className="max-w-xs" placeholder="Buscar..." value={query} onChange={(e) => { setQuery(e.target.value); setPage(0); }} />
             <div className="text-xs text-muted-foreground">{filtered.length} resultados</div>
             {selectedIds.length > 0 && (
-              <Button variant="destructive" onClick={removeSelected}>Eliminar seleccionados</Button>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={() => {
+                  const rows = pageItems.filter((f) => f.id && selectedIds.includes(f.id));
+                  const headersCsv = ["context","slug","question","answer"];
+                  const lines = rows.map((r) => [r.context, r.slug || "", escapeCsvGlobal(r.question), escapeCsvGlobal(r.answer)].join(","));
+                  const csv = [headersCsv.join(","), ...lines].join("\n");
+                  downloadCSVGlobal(csv, `faqs_${Date.now()}.csv`);
+                }}>Exportar CSV</Button>
+                <Button variant="destructive" onClick={confirmRemoveSelected}>Eliminar seleccionados</Button>
+              </div>
             )}
           </div>
         </div>
@@ -553,6 +606,16 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
             </div>
           </div>
         )}
+        <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <DialogContent className="w-[420px]">
+            <div className="px-6 py-4 border-b"><DialogTitle>Eliminar {selectedIds.length} FAQs</DialogTitle></div>
+            <div className="p-6 text-sm text-muted-foreground">Esta acción no se puede deshacer.</div>
+            <div className="flex justify-end gap-2 px-6 pb-4">
+              <Button variant="outline" onClick={() => setConfirmOpen(false)}>Cancelar</Button>
+              <Button variant="destructive" onClick={removeSelected}>Eliminar</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
