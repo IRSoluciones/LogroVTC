@@ -158,6 +158,9 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
   const [serviceOptions, setServiceOptions] = useState<{ slug: string; name: string }[]>([]);
   const [airportOptions, setAirportOptions] = useState<{ slug: string; name: string }[]>([]);
   const [stationOptions, setStationOptions] = useState<{ slug: string; name: string }[]>([]);
+  // filtros y selección múltiple
+  const [filter, setFilter] = useState<"all" | "home" | "service" | "airport" | "station">("all");
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/reviews", { headers });
     const json = await res.json();
@@ -180,6 +183,30 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
     }
   }, [headers]);
   useEffect(() => { void loadOptions(); }, [loadOptions]);
+
+  const displayItems = useMemo(() => (filter === "all" ? items : items.filter((r) => r.context === filter)), [items, filter]);
+  const allOnPageSelected = useMemo(
+    () => displayItems.length > 0 && displayItems.every((r) => (r.id ? selectedIds.includes(r.id) : true)),
+    [displayItems, selectedIds]
+  );
+
+  function toggleRow(id?: number) {
+    if (!id) return;
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }
+  function toggleAll() {
+    const ids = displayItems.map((r) => r.id).filter((x): x is number => typeof x === "number");
+    if (ids.length === 0) return;
+    setSelectedIds((prev) => (ids.every((id) => prev.includes(id)) ? prev.filter((id) => !ids.includes(id)) : Array.from(new Set([...prev, ...ids]))));
+  }
+  async function removeSelected() {
+    if (selectedIds.length === 0) return;
+    if (!confirm(`¿Eliminar ${selectedIds.length} reviews seleccionadas?`)) return;
+    await Promise.all(selectedIds.map((id) => fetch(`/api/admin/reviews?id=${id}`, { method: "DELETE", headers })));
+    setSelectedIds([]);
+    toast("Reviews eliminadas", "success");
+    load();
+  }
 
   async function submit() {
     const resp = await fetch("/api/admin/reviews", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(form) });
@@ -267,13 +294,34 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
         </CardContent>
       </Card>
       <div className="grid gap-3">
-        {items.length === 0 ? (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-1">
+            {([
+              { k: "all", l: "Todas" },
+              { k: "home", l: "Home" },
+              { k: "service", l: "Servicios" },
+              { k: "airport", l: "Aeropuertos" },
+              { k: "station", l: "Estaciones" },
+            ] as const).map((o) => (
+              <Button key={o.k} size="sm" variant={filter === o.k ? "default" : "outline"} onClick={() => setFilter(o.k)}>
+                {o.l}
+              </Button>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            {selectedIds.length > 0 && (
+              <Button variant="destructive" onClick={removeSelected}>Eliminar seleccionados</Button>
+            )}
+          </div>
+        </div>
+        {displayItems.length === 0 ? (
           <div className="text-sm text-muted-foreground">No hay reviews publicadas.</div>
         ) : (
           <div className="overflow-x-auto rounded-lg border">
             <table className="min-w-full text-sm">
               <thead className="bg-muted/50 text-muted-foreground">
                 <tr>
+                  <th className="px-3 py-2 text-left"><input type="checkbox" checked={allOnPageSelected} onChange={toggleAll} /></th>
                   <th className="px-3 py-2 text-left">Autor</th>
                   <th className="px-3 py-2 text-left">Puntuación</th>
                   <th className="px-3 py-2 text-left">Contexto</th>
@@ -283,8 +331,11 @@ function ReviewsAdmin({ headers }: { headers: Record<string, string> }) {
                 </tr>
               </thead>
               <tbody>
-                {items.map((r) => (
+                {displayItems.map((r) => (
                   <tr key={r.id} className="border-t">
+                    <td className="px-3 py-2 align-top">
+                      <input type="checkbox" checked={r.id ? selectedIds.includes(r.id) : false} onChange={() => toggleRow(r.id)} />
+                    </td>
                     <td className="px-3 py-2 align-top font-medium">{r.author}</td>
                     <td className="px-3 py-2 align-top">{r.rating}/5</td>
                     <td className="px-3 py-2 align-top">{r.context}</td>
@@ -312,6 +363,9 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
   const [form, setForm] = useState<Faq>({ context: "service", slug: "", question: "", answer: "" });
   const [notice, setNotice] = useState<string>("");
   const { toast } = useToast();
+  // filtros y selección múltiple
+  const [filter, setFilter] = useState<"all" | "service" | "airport" | "station">("all");
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   // opciones para selects de slug
   const [serviceOptions, setServiceOptions] = useState<{ slug: string; name: string }[]>([]);
   const [airportOptions, setAirportOptions] = useState<{ slug: string; name: string }[]>([]);
@@ -343,16 +397,36 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
   useEffect(() => { void loadOptions(); }, [loadOptions]);
 
   const filtered = useMemo(() => {
+    const byContext = filter === "all" ? items : items.filter((f) => f.context === filter);
     const q = query.trim().toLowerCase();
     const arr = q
-      ? items.filter((f) =>
-          [f.question, f.answer, f.context, f.slug].some((v) => (v || "").toLowerCase().includes(q))
-        )
-      : items;
+      ? byContext.filter((f) => [f.question, f.answer, f.context, f.slug].some((v) => (v || "").toLowerCase().includes(q)))
+      : byContext;
     return arr;
-  }, [items, query]);
+  }, [items, filter, query]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const pageItems = useMemo(() => filtered.slice(page * pageSize, page * pageSize + pageSize), [filtered, page]);
+  const allOnPageSelected = useMemo(
+    () => pageItems.length > 0 && pageItems.every((f) => (f.id ? selectedIds.includes(f.id) : true)),
+    [pageItems, selectedIds]
+  );
+  function toggleRow(id?: number) {
+    if (!id) return;
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }
+  function toggleAll() {
+    const ids = pageItems.map((f) => f.id).filter((x): x is number => typeof x === "number");
+    if (ids.length === 0) return;
+    setSelectedIds((prev) => (ids.every((id) => prev.includes(id)) ? prev.filter((id) => !ids.includes(id)) : Array.from(new Set([...prev, ...ids]))));
+  }
+  async function removeSelected() {
+    if (selectedIds.length === 0) return;
+    if (!confirm(`¿Eliminar ${selectedIds.length} FAQs seleccionadas?`)) return;
+    await Promise.all(selectedIds.map((id) => fetch(`/api/admin/faqs?id=${id}`, { method: "DELETE", headers })));
+    setSelectedIds([]);
+    toast("FAQs eliminadas", "success");
+    load();
+  }
 
   async function submit() {
     const resp = await fetch("/api/admin/faqs", { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(form) });
@@ -420,9 +494,26 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
         </CardContent>
       </Card>
       <div className="grid gap-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-1">
+            {([
+              { k: "all", l: "Todas" },
+              { k: "service", l: "Servicios" },
+              { k: "airport", l: "Aeropuertos" },
+              { k: "station", l: "Estaciones" },
+            ] as const).map((o) => (
+              <Button key={o.k} size="sm" variant={filter === o.k ? "default" : "outline"} onClick={() => { setFilter(o.k); setPage(0); }}>
+                {o.l}
+              </Button>
+            ))}
+          </div>
           <Input className="max-w-xs" placeholder="Buscar..." value={query} onChange={(e) => { setQuery(e.target.value); setPage(0); }} />
-          <div className="text-xs text-muted-foreground">{filtered.length} resultados</div>
+          <div className="flex items-center gap-2">
+            <div className="text-xs text-muted-foreground">{filtered.length} resultados</div>
+            {selectedIds.length > 0 && (
+              <Button variant="destructive" onClick={removeSelected}>Eliminar seleccionados</Button>
+            )}
+          </div>
         </div>
         {filtered.length === 0 ? (
           <div className="text-sm text-muted-foreground">No hay FAQs publicadas.</div>
@@ -431,6 +522,7 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-muted-foreground">
                 <tr>
+                  <th className="px-3 py-2 text-left"><input type="checkbox" checked={allOnPageSelected} onChange={toggleAll} /></th>
                   <th className="px-3 py-2 text-left">Contexto</th>
                   <th className="px-3 py-2 text-left">Slug</th>
                   <th className="px-3 py-2 text-left">Pregunta</th>
@@ -440,6 +532,7 @@ function FaqsAdmin({ headers }: { headers: Record<string, string> }) {
               <tbody>
                 {pageItems.map((f) => (
                   <tr key={f.id} className="border-t">
+                    <td className="px-3 py-2 align-top"><input type="checkbox" checked={f.id ? selectedIds.includes(f.id) : false} onChange={() => toggleRow(f.id)} /></td>
                     <td className="px-3 py-2 align-top">{f.context}</td>
                     <td className="px-3 py-2 align-top">{f.slug || "—"}</td>
                     <td className="px-3 py-2 align-top max-w-[28rem] truncate">{f.question}</td>
