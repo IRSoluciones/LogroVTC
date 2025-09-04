@@ -53,7 +53,8 @@ export default function Gallery({ count = 8 }: GalleryProps) {
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm flex items-center justify-center"
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center"
+      style={{ zIndex: 2147483647 }}
       onClick={() => setLightboxIndex(null)}
     >
       <div
@@ -64,8 +65,9 @@ export default function Gallery({ count = 8 }: GalleryProps) {
           src={images[lightboxIndex]}
           alt={`Vehículo ${lightboxIndex + 1}`}
           fill
-          className="object-contain"
+          className="object-contain pointer-events-none select-none"
           sizes="(max-width: 1280px) 92vw, 1280px"
+          priority
         />
         <button
           onClick={(e) => { e.stopPropagation(); setLightboxIndex((prev) => (prev! - 1 + images.length) % images.length); }}
