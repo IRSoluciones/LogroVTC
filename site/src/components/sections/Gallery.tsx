@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 
 type GalleryProps = { count?: number };
@@ -37,6 +38,52 @@ export default function Gallery({ count = 8 }: GalleryProps) {
     };
   }, [lightboxIndex, images.length]);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  const lightboxEl = lightboxIndex !== null ? (
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center"
+      onClick={() => setLightboxIndex(null)}
+    >
+      <div
+        className="relative w-[92vw] max-w-5xl h-[82vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Image
+          src={images[lightboxIndex]}
+          alt={`Vehículo ${lightboxIndex + 1}`}
+          fill
+          className="object-contain"
+          sizes="(max-width: 1280px) 92vw, 1280px"
+        />
+        <button
+          onClick={(e) => { e.stopPropagation(); setLightboxIndex((prev) => (prev! - 1 + images.length) % images.length); }}
+          className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/90 text-black grid place-items-center"
+          aria-label="Imagen anterior"
+        >
+          ‹
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); setLightboxIndex((prev) => (prev! + 1) % images.length); }}
+          className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/90 text-black grid place-items-center"
+          aria-label="Imagen siguiente"
+        >
+          ›
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); setLightboxIndex(null); }}
+          className="absolute right-2 top-2 h-9 w-9 rounded-full bg-white/90 text-black grid place-items-center"
+          aria-label="Cerrar"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  ) : null;
+
   return (
     <section id="galeria" className="mt-24">
       <h3 className="text-3xl font-semibold">Galería de vehículos</h3>
@@ -48,48 +95,7 @@ export default function Gallery({ count = 8 }: GalleryProps) {
         ))}
       </div>
 
-      {lightboxIndex !== null && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center"
-          onClick={() => setLightboxIndex(null)}
-        >
-          <div
-            className="relative w-[92vw] max-w-5xl h-[82vh]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src={images[lightboxIndex]}
-              alt={`Vehículo ${lightboxIndex + 1}`}
-              fill
-              className="object-contain"
-              sizes="(max-width: 1280px) 92vw, 1280px"
-            />
-            <button
-              onClick={(e) => { e.stopPropagation(); setLightboxIndex((prev) => (prev! - 1 + images.length) % images.length); }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/90 text-black grid place-items-center"
-              aria-label="Imagen anterior"
-            >
-              ‹
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); setLightboxIndex((prev) => (prev! + 1) % images.length); }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white/90 text-black grid place-items-center"
-              aria-label="Imagen siguiente"
-            >
-              ›
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); setLightboxIndex(null); }}
-              className="absolute right-2 top-2 h-9 w-9 rounded-full bg-white/90 text-black grid place-items-center"
-              aria-label="Cerrar"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
+      {mounted && lightboxEl ? createPortal(lightboxEl, document.body) : null}
     </section>
   );
 }
