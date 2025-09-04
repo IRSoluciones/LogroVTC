@@ -167,6 +167,8 @@ export default function RootLayout({
         </a>
         <CookieBanner />
         <CookieWidget />
+        {/* Portal root para modales/lightbox globales */}
+        <div id="portal-root" />
       </body>
     </html>
   );

@@ -103,7 +103,7 @@ export default function Gallery({ count = 8 }: GalleryProps) {
         ))}
       </div>
 
-      {mounted && lightboxEl ? createPortal(lightboxEl, document.body) : null}
+      {mounted && lightboxEl ? createPortal(lightboxEl, document.getElementById("portal-root") || document.body) : null}
     </section>
   );
 }
