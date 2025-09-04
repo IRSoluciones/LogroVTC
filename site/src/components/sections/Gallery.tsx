@@ -7,18 +7,26 @@ type GalleryProps = { count?: number };
 
 export default function Gallery({ count = 8 }: GalleryProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [images, setImages] = useState<string[]>(Array.from({ length: count }, (_, i) => `/vehicles/vehicle-${i + 1}.jpg`));
+  const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
+    let cancelled = false;
+    const fallback = Array.from({ length: count }, (_, i) => `/vehicles/vehicle-${i + 1}.jpg`);
     fetch(`/api/public/gallery?limit=${count}`)
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((json) => {
+        if (cancelled) return;
         if (json?.ok && Array.isArray(json.images) && json.images.length > 0) {
           const urls = json.images.map((it: { url: string }) => it.url);
           setImages(urls);
+        } else {
+          setImages(fallback);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!cancelled) setImages(fallback);
+      });
+    return () => { cancelled = true; };
   }, [count]);
 
   // Bloqueo del scroll de fondo y navegación por teclado cuando el lightbox está abierto
