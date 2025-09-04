@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "./button";
 import { X } from "lucide-react";
 
@@ -35,6 +36,8 @@ export default function ServiceModal({ isOpen, onClose, serviceType }: ModalProp
     };
   }, [isOpen]);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   if (!isOpen) return null;
 
   const getServiceTitle = () => {
@@ -229,7 +232,7 @@ export default function ServiceModal({ isOpen, onClose, serviceType }: ModalProp
     onClose();
   };
 
-  return (
+  const modal = (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-2xl mx-4 bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -300,4 +303,6 @@ export default function ServiceModal({ isOpen, onClose, serviceType }: ModalProp
       </div>
     </div>
   );
+
+  return mounted ? createPortal(modal, document.body) : null;
 }
