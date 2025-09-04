@@ -45,7 +45,7 @@ export default function Gallery({ count = 8 }: GalleryProps) {
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center"
+      className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center"
       onClick={() => setLightboxIndex(null)}
     >
       <div
