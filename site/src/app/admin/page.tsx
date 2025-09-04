@@ -74,7 +74,6 @@ export default function AdminPage() {
   return (
     <ToastProvider>
     <main className="mx-auto max-w-6xl px-4 py-8 grid gap-6">
-      <SeedControls headers={headers} />
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/50 border-b py-3">
         <div className="flex flex-wrap gap-2">
           {([
@@ -1055,7 +1054,9 @@ function GalleryAdmin({ headers }: { headers: Record<string, string> }) {
                     <Image src={it.url} alt={it.alt || ""} fill className="object-cover" />
                   ) : null}
                 </div>
-                <div className="text-sm truncate">{it.url}</div>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(it.url); toast("URL copiada", "success"); }}>Copiar URL</Button>
+                </div>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <Input placeholder="alt" value={it.alt || ""} onChange={(e) => setItems((arr) => arr.map((x, i) => i === idx ? { ...x, alt: e.target.value } : x))} />
