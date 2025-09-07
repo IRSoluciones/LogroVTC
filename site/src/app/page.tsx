@@ -181,7 +181,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-12 gap-12 items-start">
             <div className="relative md:col-span-5 order-2 md:order-1">
               <div className="sticky top-24 h-[500px] rounded-2xl overflow-hidden border border-border">
-                <Image src="/vehicles/vehicle-2.jpg" alt="Traslado aeropuerto" fill className="object-cover" />
+                <Image src="/vehicles/vehicle-10.jpg" alt="Traslado al aeropuerto" fill className="object-cover" />
               </div>
               <div className="absolute -top-5 -right-5 w-56 rotate-1 rounded-xl border border-border bg-white/80 backdrop-blur shadow-md p-4">
                 <div className="text-xs uppercase tracking-wide text-muted-foreground">Traslados</div>
