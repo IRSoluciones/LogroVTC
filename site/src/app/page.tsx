@@ -34,6 +34,7 @@ export default function HomePage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalServiceType, setModalServiceType] = useState<"aeropuerto" | "camino" | "mensajeria">("aeropuerto");
   const [genericModalOpen, setGenericModalOpen] = useState(false);
+  const [mensajeriaImg, setMensajeriaImg] = useState("/vehicles/mensajeria.jpg");
 
   const openModal = (serviceType: "aeropuerto" | "camino" | "mensajeria") => {
     setModalServiceType(serviceType);
@@ -181,7 +182,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-12 gap-12 items-start">
             <div className="relative md:col-span-5 order-2 md:order-1">
               <div className="sticky top-24 h-[500px] rounded-2xl overflow-hidden border border-border">
-                <Image src="/vehicles/airport.jpg" alt="Traslado al aeropuerto (recogida en llegadas)" fill className="object-cover" />
+                <Image src="/vehicles/vehicle-10.jpg" alt="Traslado al aeropuerto" fill className="object-cover" />
               </div>
               <div className="absolute -top-5 -right-5 w-56 rotate-1 rounded-xl border border-border bg-white/80 backdrop-blur shadow-md p-4">
                 <div className="text-xs uppercase tracking-wide text-muted-foreground">Traslados</div>
@@ -279,7 +280,7 @@ export default function HomePage() {
             </div>
             <div className="md:col-span-5 relative">
               <div className="sticky top-24 h-[500px] rounded-2xl overflow-hidden border border-border">
-                <Image src="/vehicles/camino.jpg" alt="Peregrinos en el Camino de Santiago" fill className="object-cover" />
+                <Image src="/vehicles/vehicle-3.jpg" alt="Camino de Santiago" fill className="object-cover" />
               </div>
               <div className="absolute -bottom-5 -left-5 w-56 -rotate-3 rounded-xl border border-border bg-white/80 backdrop-blur shadow-md p-4">
                 <div className="text-xs uppercase tracking-wide text-muted-foreground">Etapas</div>
@@ -296,7 +297,13 @@ export default function HomePage() {
           <div className="grid md:grid-cols-12 gap-12 items-start">
             <div className="md:col-span-5 relative">
               <div className="sticky top-24 h-[500px] rounded-2xl overflow-hidden border border-border">
-                <Image src="/vehicles/vehicle-4.jpg" alt="Mensajería urgente" fill className="object-cover" />
+                <Image
+                  src={mensajeriaImg}
+                  alt="Mensajería urgente"
+                  fill
+                  className="object-cover"
+                  onError={() => setMensajeriaImg("/vehicles/vehicle-4.jpg")}
+                />
               </div>
               <div className="absolute -top-5 -left-5 w-56 rotate-2 rounded-xl border border-border bg-white/80 backdrop-blur shadow-md p-4">
                 <div className="text-xs uppercase tracking-wide text-muted-foreground">Express</div>
