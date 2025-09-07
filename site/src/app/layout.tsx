@@ -23,17 +23,17 @@ const display = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "LogroVTC | Traslados, Aeropuertos, Camino y Mensajería",
+  title: "VTC en Logroño y La Rioja | Traslados Aeropuerto, Camino y Mensajería – LogroVTC",
   description:
-    "VTC en La Rioja y Rioja Alavesa. Traslados a aeropuertos, Camino de Santiago y mensajería urgente. Teléfono 630926611.",
-  metadataBase: new URL("https://example.com"),
+    "VTC en Logroño y La Rioja. Traslados a aeropuertos (Bilbao, Pamplona, Madrid, Zaragoza), apoyo al Camino de Santiago y mensajería urgente con precio cerrado. Tel. 630 92 66 11.",
+  metadataBase: new URL("https://logro-vtc.vercel.app"),
   alternates: { canonical: "/" },
   openGraph: {
-    title: "LogroVTC | Traslados, Aeropuertos, Camino y Mensajería",
+    title: "VTC en Logroño y La Rioja | LogroVTC",
     description:
-      "Traslados VTC, aeropuertos, Camino de Santiago y mensajería urgente.",
-    url: "https://example.com/",
-    siteName: "VTC La Rioja",
+      "Traslados VTC en La Rioja: aeropuertos, Camino de Santiago y mensajería urgente con precio cerrado.",
+    url: "https://logro-vtc.vercel.app/",
+    siteName: "LogroVTC",
     type: "website",
     locale: "es_ES",
     images: [
@@ -41,15 +41,15 @@ export const metadata: Metadata = {
         url: "/vehicles/vehicle-1.jpg",
         width: 1200,
         height: 630,
-        alt: "Vehículos LogroTaxi",
+        alt: "Vehículos LogroVTC",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "LogroVTC | Traslados, Aeropuertos, Camino y Mensajería",
+    title: "VTC en Logroño y La Rioja | LogroVTC",
     description:
-      "Traslados VTC, aeropuertos, Camino de Santiago y mensajería urgente.",
+      "Traslados a aeropuertos, Camino de Santiago y mensajería urgente.",
     images: ["/vehicles/vehicle-1.jpg"],
   },
 };
@@ -70,10 +70,10 @@ export default function RootLayout({
               '@context': 'https://schema.org',
               '@type': 'LocalBusiness',
               name: 'LogroVTC',
-              url: 'https://example.com',
+              url: 'https://logro-vtc.vercel.app',
               telephone: '+34630926611',
               areaServed: ['La Rioja', 'Rioja Alavesa', 'España'],
-              image: 'https://example.com/vehicles/vehicle-1.jpg',
+              image: 'https://logro-vtc.vercel.app/vehicles/vehicle-1.jpg',
               sameAs: [],
               address: { '@type': 'PostalAddress', addressCountry: 'ES' },
               openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: 'https://schema.org/AllDay', opens: '00:00', closes: '23:59' }],

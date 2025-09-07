@@ -56,13 +56,12 @@ export default function HomePage() {
           <div className="relative z-10 grid md:grid-cols-2 gap-8 items-center">
             <div>
               <h1 className="font-[var(--font-display)] text-6xl md:text-7xl font-extrabold leading-[0.95]">
-                Traslados VTC en La Rioja
-                <br /> y el Norte de España
+                VTC en Logroño y La Rioja
+                <br /> Traslados, Aeropuerto y Mensajería
               </h1>
               <p className="mt-5 text-muted-foreground text-lg max-w-prose">
-                LogroVTC es un equipo de conductores profesionales con base en La Rioja y Rioja Alavesa. Realizamos
-                traslados a aeropuertos y estaciones, apoyo al Camino de Santiago, mensajería urgente y rutas turísticas por
-                todo el norte de España. Flota moderna, atención cercana, puntualidad y pago con tarjeta.
+                LogroVTC es tu <strong>VTC en Logroño y La Rioja</strong>. Realizamos <strong>traslado aeropuerto Logroño</strong> (Bilbao, Pamplona, Madrid, Zaragoza),
+                apoyo al <strong>Camino de Santiago</strong> y <strong>mensajería urgente en La Rioja</strong> con precio cerrado. Flota moderna, puntualidad y pago con tarjeta.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button asChild size="lg">
@@ -202,10 +201,19 @@ export default function HomePage() {
                 <div>
                   <h3 className="text-4xl font-bold leading-tight">Aeropuerto sin estrés</h3>
                   <p className="mt-3 text-muted-foreground">
-                    Desplazamientos al aeropuerto desde el lugar que nos indiques y traslados de llegada a tu casa, empresa,
-                    hotel, bodega u otro destino, sin esperas. También realizamos recogida de viajeros y transporte/recogida
-                    de equipajes y mercancías.
+                    <strong>Traslado aeropuerto Logroño</strong> y conexiones a <strong>Bilbao (BIO)</strong>, <strong>Pamplona (PNA)</strong>, <strong>Madrid‑Barajas (MAD)</strong> y
+                    <strong> Zaragoza (ZAZ)</strong>. Recogida en llegadas con cartela, seguimiento de vuelo y precio cerrado. También transporte de
+                    equipajes y mercancías.
                   </p>
+                  <div className="mt-3 text-sm">
+                    <span className="font-medium">Rutas más demandadas:</span>
+                    <ul className="list-disc pl-5 mt-2 space-y-1">
+                      <li><Link className="underline" href="/aeropuertos/bilbao">Logroño ↔ Aeropuerto de Bilbao (BIO)</Link></li>
+                      <li><Link className="underline" href="/aeropuertos/pamplona">Logroño ↔ Aeropuerto de Pamplona (PNA)</Link></li>
+                      <li><Link className="underline" href="/aeropuertos/madrid-barajas">Logroño ↔ Aeropuerto de Madrid‑Barajas (MAD)</Link></li>
+                      <li><Link className="underline" href="/aeropuertos/zaragoza">Logroño ↔ Aeropuerto de Zaragoza (ZAZ)</Link></li>
+                    </ul>
+                  </div>
                   <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
                     <div className="rounded-lg border border-border p-3 inline-flex items-center gap-2"><Plane className="text-primary shrink-0 w-6 h-6"/> Al aeropuerto desde cualquier origen</div>
                     <div className="rounded-lg border border-border p-3 inline-flex items-center gap-2"><Home className="text-primary shrink-0 w-6 h-6"/> Desde aeropuerto a casa/empresa/hotel</div>
