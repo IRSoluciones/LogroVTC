@@ -76,6 +76,33 @@ export default async function ServicePage({ params }: PageProps) {
   } catch {}
   if (!service) return notFound();
 
+  // JSON-LD para Service y FAQPage (schema.org)
+  const faqStatic = getServiceFaqs(service.slug);
+  const serviceSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: service.name,
+    description: service.description,
+    areaServed: ["La Rioja", "Rioja Alavesa", "España"],
+    provider: {
+      "@type": "LocalBusiness",
+      name: "LogroVTC",
+      telephone: "+34630926611",
+      areaServed: ["La Rioja", "España"],
+      url: "https://logro-vtc.vercel.app"
+    },
+    serviceType: service.slug,
+  });
+  const faqSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqStatic.map((it) => ({
+      "@type": "Question",
+      name: it.q,
+      acceptedAnswer: { "@type": "Answer", text: it.a },
+    })),
+  });
+
   return (
     <main className="mx-auto max-w-6xl px-4 pt-0 pb-10">
       <Reveal>
@@ -143,6 +170,9 @@ export default async function ServicePage({ params }: PageProps) {
 
       <Reveal><OtherServices /></Reveal>
       <Reveal><CTASection /></Reveal>
+      {/* JSON-LD */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serviceSchema }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqSchema }} />
     </main>
   );
 }
