@@ -76,8 +76,56 @@ export default async function StationPage({ params }: PageProps) {
   } catch {}
   if (!station) return notFound();
 
+  // Preparar JSON-LD (Service, FAQPage y Breadcrumb)
+  let faqItems: { q: string; a: string }[] = getStationFaqs();
+  try {
+    const list = await getFaqs("station", station.slug);
+    const mapped = list.map((it) => ({ q: it.question, a: it.answer }));
+    if (mapped.length > 0) faqItems = mapped;
+  } catch {}
+
+  const serviceSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: `Traslados a ${station.name}`,
+    description: station.description || station.intro,
+    serviceType: station.type === "bus" ? "BusStationTransfer" : "TrainStationTransfer",
+    areaServed: ["La Rioja", "Rioja Alavesa", "España"],
+    provider: {
+      "@type": "LocalBusiness",
+      name: "LogroVTC",
+      telephone: "+34630926611",
+      url: `https://logro-vtc.vercel.app/estaciones/${station.slug}`,
+      areaServed: ["La Rioja", "España"],
+    },
+  } as const;
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((it) => ({
+      "@type": "Question",
+      name: it.q,
+      acceptedAnswer: { "@type": "Answer", text: it.a },
+    })),
+  } as const;
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Inicio", item: "https://logro-vtc.vercel.app/" },
+      { "@type": "ListItem", position: 2, name: "Estaciones", item: "https://logro-vtc.vercel.app/estaciones" },
+      { "@type": "ListItem", position: 3, name: station.name, item: `https://logro-vtc.vercel.app/estaciones/${station.slug}` },
+    ],
+  } as const;
+
   return (
     <main className="mx-auto max-w-6xl px-4 pt-0 pb-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([serviceSchema, faqSchema, breadcrumbSchema]) }}
+      />
       <Reveal>
         <HeroWithForm
           title={`Traslados a ${station.name}`}
