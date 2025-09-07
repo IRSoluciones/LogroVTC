@@ -53,7 +53,7 @@ export default function Gallery({ count = 8 }: GalleryProps) {
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center"
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center pointer-events-auto"
       style={{ zIndex: 2147483647 }}
       onClick={() => setLightboxIndex(null)}
     >
@@ -105,7 +105,7 @@ export default function Gallery({ count = 8 }: GalleryProps) {
         ))}
       </div>
 
-      {mounted && lightboxEl ? createPortal(lightboxEl, document.getElementById("portal-root") || document.body) : null}
+      {mounted && lightboxEl ? createPortal(lightboxEl, document.body) : null}
     </section>
   );
 }
