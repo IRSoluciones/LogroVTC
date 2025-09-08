@@ -103,6 +103,16 @@ export default async function ServicePage({ params }: PageProps) {
     })),
   });
 
+  const breadcrumbSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Inicio", item: "https://logro-vtc.vercel.app/" },
+      { "@type": "ListItem", position: 2, name: "Servicios", item: "https://logro-vtc.vercel.app/servicios" },
+      { "@type": "ListItem", position: 3, name: service.name, item: `https://logro-vtc.vercel.app/servicios/${service.slug}` },
+    ],
+  });
+
   return (
     <main className="mx-auto max-w-6xl px-4 pt-0 pb-10">
       <Reveal>
@@ -173,6 +183,7 @@ export default async function ServicePage({ params }: PageProps) {
       {/* JSON-LD */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serviceSchema }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqSchema }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbSchema }} />
     </main>
   );
 }
