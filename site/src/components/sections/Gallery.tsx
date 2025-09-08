@@ -34,14 +34,40 @@ export default function Gallery({ count = 8 }: GalleryProps) {
         if (json?.ok && Array.isArray(json.images) && json.images.length > 0) {
           let urls: string[] = json.images.map((it: { url: string }) => it.url).filter(Boolean);
           urls = urls.filter((u) => !isBanned(u));
-          if (urls.length < count) {
-            const needed = count - urls.length;
-            for (let i = 0; i < needed; i++) {
-              const fb = fallback[(urls.length + i) % fallback.length];
-              if (!urls.includes(fb)) urls.push(fb);
+
+          const keyOf = (u: string) => {
+            const x = normalize(u);
+            try {
+              const parsed = new URL(x);
+              const segs = parsed.pathname.split("/");
+              return segs[segs.length - 1];
+            } catch {
+              const segs = x.split("/");
+              return segs[segs.length - 1];
+            }
+          };
+
+          const seen = new Set<string>();
+          const uniques: string[] = [];
+          for (const u of urls) {
+            const k = keyOf(u);
+            if (!seen.has(k)) {
+              seen.add(k);
+              uniques.push(u);
             }
           }
-          setImages(urls.slice(0, count));
+
+          // Rellenar con fallbacks sin repetir por clave
+          for (let i = 0; uniques.length < count && i < fallback.length; i++) {
+            const fb = fallback[i % fallback.length];
+            const k = keyOf(fb);
+            if (!seen.has(k)) {
+              seen.add(k);
+              uniques.push(fb);
+            }
+          }
+
+          setImages(uniques.slice(0, count));
         } else {
           setImages(fallback);
         }
