@@ -16,9 +16,32 @@ export default function Gallery({ count = 8 }: GalleryProps) {
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((json) => {
         if (cancelled) return;
+        const normalize = (u: string) => {
+          try {
+            if (u.includes("/_next/image")) {
+              const urlObj = new URL(u, typeof window !== "undefined" ? window.location.origin : "https://logro-vtc.vercel.app");
+              const raw = urlObj.searchParams.get("url");
+              if (raw) return decodeURIComponent(raw);
+            }
+          } catch {}
+          return u;
+        };
+        const isBanned = (u: string) => {
+          const x = normalize(u);
+          return x.includes("supabase.co/storage/v1/object/public/gallery/seed/") && x.includes("vehicle-6.jpg");
+        };
+
         if (json?.ok && Array.isArray(json.images) && json.images.length > 0) {
-          const urls = json.images.map((it: { url: string }) => it.url);
-          setImages(urls);
+          let urls: string[] = json.images.map((it: { url: string }) => it.url).filter(Boolean);
+          urls = urls.filter((u) => !isBanned(u));
+          if (urls.length < count) {
+            const needed = count - urls.length;
+            for (let i = 0; i < needed; i++) {
+              const fb = fallback[(urls.length + i) % fallback.length];
+              if (!urls.includes(fb)) urls.push(fb);
+            }
+          }
+          setImages(urls.slice(0, count));
         } else {
           setImages(fallback);
         }
@@ -54,6 +77,7 @@ export default function Gallery({ count = 8 }: GalleryProps) {
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center pointer-events-auto"
+      
       style={{ zIndex: 2147483647 }}
       onClick={() => setLightboxIndex(null)}
     >
