@@ -10,7 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/aeropuertos`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${base}/estaciones`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${base}/aviso-legal`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
-    { url: `${base}/politica-cookies`, lastModified: now, changeFrequency: "yearly`, priority: 0.3 },
+    { url: `${base}/politica-cookies`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${base}/politica-privacidad`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     { url: `${base}/politica-accesibilidad`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
   ];
