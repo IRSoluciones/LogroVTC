@@ -89,14 +89,10 @@ export default function RootLayout({
           <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
             <Link href="/#inicio" className="text-lg font-semibold tracking-tight">LogroVTC</Link>
             <nav className="hidden md:flex items-center gap-6 text-sm">
-              <a href="#inicio" className="hover:underline">Inicio</a>
-              <a href="#features" className="hover:underline">Ventajas</a>
-              <a href="#servicios" className="hover:underline">Servicios</a>
-              <a href="#aeropuerto" className="hover:underline">Aeropuerto</a>
-              <a href="#camino" className="hover:underline">Camino</a>
-              <a href="#mensajeria" className="hover:underline">Mensajería</a>
-              <a href="#galeria" className="hover:underline">Galería</a>
-              <a href="#contacto" className="hover:underline">Contacto</a>
+              <Link href="/#inicio" className="hover:underline">Inicio</Link>
+              <Link href="/#aeropuerto" className="hover:underline">Aeropuertos</Link>
+              <Link href="/#camino" className="hover:underline">Camino de Santiago</Link>
+              <Link href="/#mensajeria" className="hover:underline">Mensajería</Link>
             </nav>
             <a
               href="tel:630926611"
