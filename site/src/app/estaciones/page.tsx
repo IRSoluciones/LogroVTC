@@ -24,6 +24,21 @@ export default async function EstacionesIndexPage() {
   })();
   return (
     <main className="mx-auto max-w-6xl px-4 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            itemListElement: list.map((s: { slug: string; name: string }, index: number) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              name: s.name,
+              url: `https://logro-vtc.vercel.app/estaciones/${s.slug}`,
+            })),
+          }),
+        }}
+      />
       <Reveal>
         <h1 className="text-3xl font-semibold tracking-tight">Estaciones</h1>
       </Reveal>

@@ -24,6 +24,21 @@ export default async function AeropuertosIndexPage() {
   })();
   return (
     <main className="mx-auto max-w-6xl px-4 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            itemListElement: list.map((a: { slug: string; name: string }, index: number) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              name: a.name,
+              url: `https://logro-vtc.vercel.app/aeropuertos/${a.slug}`,
+            })),
+          }),
+        }}
+      />
       <Reveal>
         <h1 className="text-3xl font-semibold tracking-tight">Aeropuertos</h1>
       </Reveal>
