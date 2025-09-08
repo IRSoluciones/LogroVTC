@@ -8,7 +8,7 @@ export default function CookieBanner() {
   const [mounted, setMounted] = useState(false);
   const [forceOpen, setForceOpen] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
-  const { hasConsent, loaded } = useCookies();
+  const { hasConsent, loaded, acceptNecessary } = useCookies();
 
   useEffect(() => {
     setMounted(true);
@@ -20,7 +20,6 @@ export default function CookieBanner() {
     if (!hasConsent) {
       if (!userInteracted) setForceOpen(true);
     } else {
-      // Cuando ya hay consentimiento, aseguramos cierre y limpiamos la marca
       setForceOpen(false);
       if (userInteracted) setUserInteracted(false);
     }
@@ -30,11 +29,16 @@ export default function CookieBanner() {
   if (hasConsent && !forceOpen) return null;
 
   const handleOpenChange = (open: boolean) => {
-    setForceOpen(open);
-    if (!open) setUserInteracted(true);
+    if (!open) {
+      setUserInteracted(true);
+      if (!hasConsent) acceptNecessary();
+      setForceOpen(false);
+    } else {
+      setForceOpen(true);
+    }
   };
 
   return (
-    <CookieManager open={!hasConsent || forceOpen} onOpenChange={handleOpenChange} hideTrigger preventClose={!hasConsent} />
+    <CookieManager open={forceOpen} onOpenChange={handleOpenChange} hideTrigger preventClose={false} />
   );
 }
