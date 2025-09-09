@@ -1,0 +1,91 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { fetchServices, type StrapiItem, type ServiceDto } from "@/lib/strapi";
+
+export const metadata: Metadata = {
+  title: "Servicios | LogroVTC",
+  description: "Servicios de traslados VTC en La Rioja: aeropuertos, Camino y mensajería.",
+  alternates: { canonical: "https://logro-vtc.vercel.app/servicios" },
+  openGraph: {
+    title: "Servicios | LogroVTC",
+    description: "Listado de servicios VTC.",
+    url: "https://logro-vtc.vercel.app/servicios",
+    type: "website",
+  },
+};
+
+export default async function ServiciosIndexPage() {
+  let items: Array<StrapiItem<ServiceDto>> = [];
+  try {
+    const json = await fetchServices();
+    items = json.data;
+  } catch {}
+
+  return (
+    <main className="mx-auto max-w-5xl px-4 py-12">
+      <h1 className="text-3xl font-semibold tracking-tight">Servicios</h1>
+      <div className="mt-8 grid gap-6 md:grid-cols-3">
+        {items.map((it) => (
+          <article key={it.id} className="rounded-xl border p-5 bg-card">
+            <h2 className="text-xl font-semibold">{it.attributes.name}</h2>
+            <p className="mt-2 text-sm text-muted-foreground">{it.attributes.description}</p>
+            <div className="mt-4">
+              <Link className="underline" href={`/servicios/${it.attributes.slug}`}>Ver detalle</Link>
+            </div>
+          </article>
+        ))}
+      </div>
+    </main>
+  );
+}
+
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
+import { services } from "@/lib/site-data";
+import { isStrapiEnabled, fetchServices } from "@/lib/strapi";
+import Reveal from "@/components/visual/Reveal";
+
+export const metadata: Metadata = {
+  title: "Servicios | LogroVTC",
+  description: "Servicios de traslados VTC en La Rioja: aeropuertos, Camino y mensajería.",
+  alternates: { canonical: "https://example.com/servicios" },
+  openGraph: { title: "Servicios | LogroVTC", description: "Listado de servicios VTC.", url: "https://example.com/servicios", type: "website" },
+};
+
+export default async function ServiciosIndexPage() {
+  const list = isStrapiEnabled
+    ? await (async () => {
+        try {
+          const json = await fetchServices();
+          return json.data.map((it) => it.attributes);
+        } catch (e) {
+          return services;
+        }
+      })()
+    : services;
+  return (
+    <main className="mx-auto max-w-6xl px-4 py-12">
+      <Reveal>
+        <h1 className="text-3xl font-semibold tracking-tight">Servicios</h1>
+      </Reveal>
+      <div className="mt-8 grid md:grid-cols-3 gap-6">
+        {list.map((s: { slug: string; name: string; description: string }, i: number) => (
+          <Reveal key={s.slug} delay={i * 80}>
+            <Card className="border-border/80 bg-gradient-to-b from-card to-card/60">
+              <CardContent className="p-5">
+                <h2 className="text-xl font-semibold">{s.name}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">{s.description}</p>
+                <div className="mt-4">
+                  <Link className="underline" href={`/servicios/${s.slug}`}>Ver detalle</Link>
+                </div>
+              </CardContent>
+            </Card>
+          </Reveal>
+        ))}
+      </div>
+    </main>
+  );
+}
+
+
