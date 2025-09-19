@@ -40,7 +40,7 @@ export default function HeroWithForm({ title, subtitle, serviceType = "aeropuert
           </p>
           <div className="mt-8 flex flex-wrap gap-3 opacity-0 animate-[fadeIn_1s_ease-out_0.5s_forwards]">
             <Button asChild size="lg">
-              <a href="tel:630926611">
+              <a href="tel:722109111">
                 Llamar ahora <ArrowRight size={16} />
               </a>
             </Button>
@@ -50,7 +50,11 @@ export default function HeroWithForm({ title, subtitle, serviceType = "aeropuert
           </div>
         </div>
         <div className="relative">
-          <form action="/api/contact" method="post" className="relative rounded-2xl border border-border bg-white/80 backdrop-blur p-6 opacity-0 animate-[fadeIn_1s_ease-out_0.7s_forwards]">
+          <form action="https://formsubmit.co/larioja@logrotaxi.com" method="POST" className="relative rounded-2xl border border-border bg-white/80 backdrop-blur p-6 opacity-0 animate-[fadeIn_1s_ease-out_0.7s_forwards]">
+            <input type="hidden" name="_subject" value="Nueva solicitud LogroVTC" />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_next" value="https://logrovtc.com/mail/gracias" />
+            <input type="text" name="_honey" className="hidden" aria-hidden="true" tabIndex={-1} />
             <h3 className="text-xl font-semibold mb-1">Solicita tu servicio</h3>
             <p className="text-sm text-muted-foreground mb-3">Este formulario se enviará al equipo de LogroVTC. Te contactaremos para confirmar tu traslado.</p>
             <div className="grid md:grid-cols-2 gap-3">

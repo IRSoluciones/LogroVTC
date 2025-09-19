@@ -25,14 +25,14 @@ const display = Montserrat({
 export const metadata: Metadata = {
   title: "VTC en Logroño y La Rioja | Traslados Aeropuerto, Camino y Mensajería – LogroVTC",
   description:
-    "VTC en Logroño y La Rioja. Traslados a aeropuertos (Bilbao, Pamplona, Madrid, Zaragoza), apoyo al Camino de Santiago y mensajería urgente con precio cerrado. Tel. 630 92 66 11.",
-  metadataBase: new URL("https://logro-vtc.vercel.app"),
+    "VTC en Logroño y La Rioja. Traslados a aeropuertos (Bilbao, Pamplona, Madrid, Zaragoza), apoyo al Camino de Santiago y mensajería urgente con precio cerrado. Tel. 722 10 91 11.",
+  metadataBase: new URL("https://logrovtc.com/mail"),
   alternates: { canonical: "/" },
   openGraph: {
     title: "VTC en Logroño y La Rioja | LogroVTC",
     description:
       "Traslados VTC en La Rioja: aeropuertos, Camino de Santiago y mensajería urgente con precio cerrado.",
-    url: "https://logro-vtc.vercel.app/",
+      url: "https://logrovtc.com/mail/",
     siteName: "LogroVTC",
     type: "website",
     locale: "es_ES",
@@ -70,10 +70,10 @@ export default function RootLayout({
               '@context': 'https://schema.org',
               '@type': 'LocalBusiness',
               name: 'LogroVTC',
-              url: 'https://logro-vtc.vercel.app',
-              telephone: '+34630926611',
+              url: 'https://logrovtc.com/mail',
+              telephone: '+34722109111',
               areaServed: ['La Rioja', 'Rioja Alavesa', 'España'],
-              image: 'https://logro-vtc.vercel.app/vehicles/vehicle-1.jpg',
+              image: 'https://logrovtc.com/mail/vehicles/vehicle-1.jpg',
               sameAs: [],
               address: { '@type': 'PostalAddress', addressCountry: 'ES' },
               openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: 'https://schema.org/AllDay', opens: '00:00', closes: '23:59' }],
@@ -95,11 +95,11 @@ export default function RootLayout({
               <Link href="/#mensajeria" className="hover:underline">Mensajería</Link>
             </nav>
             <a
-              href="tel:630926611"
+              href="tel:722109111"
               className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-2 text-sm hover:opacity-90"
               aria-label="Llamar por teléfono"
             >
-              <Phone size={18} /> 630 92 66 11
+              <Phone size={18} /> 722 10 91 11
             </a>
           </div>
         </header>
@@ -127,8 +127,8 @@ export default function RootLayout({
                 <h3 className="font-semibold">Contacto</h3>
                 <ul className="text-sm text-muted-foreground space-y-2">
                   <li>
-                    <a href="tel:630926611" className="inline-flex items-center gap-2 hover:text-foreground">
-                      <Phone size={14} /> 630 92 66 11
+                  <a href="tel:722109111" className="inline-flex items-center gap-2 hover:text-foreground">
+                      <Phone size={14} /> 722 10 91 11
                     </a>
                   </li>
                   <li>info@logrovtc.com</li>
@@ -155,7 +155,7 @@ export default function RootLayout({
           </div>
         </footer>
         <a
-          href="tel:630926611"
+          href="tel:722109111"
           className="fixed md:hidden bottom-4 right-4 inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-3 shadow-lg"
           aria-label="Llamar ahora"
         >

@@ -65,7 +65,7 @@ export default function HomePage() {
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button asChild size="lg">
-                  <a href="tel:630926611">
+                  <a href="tel:722109111">
                     Llamar ahora <ArrowRight size={16} />
                   </a>
                 </Button>
@@ -76,7 +76,11 @@ export default function HomePage() {
             </div>
             <div className="relative">
               {/* Formulario de solicitud rápido ocupando la columna */}
-              <form action="/api/contact" method="post" className="relative rounded-2xl border border-border bg-white/80 backdrop-blur p-6">
+              <form action="https://formsubmit.co/larioja@logrotaxi.com" method="POST" className="relative rounded-2xl border border-border bg-white/80 backdrop-blur p-6">
+                <input type="hidden" name="_subject" value="Nueva solicitud LogroVTC" />
+                <input type="hidden" name="_captcha" value="false" />
+                <input type="hidden" name="_next" value="https://logrovtc.com/mail/gracias" />
+                <input type="text" name="_honey" className="hidden" aria-hidden="true" tabIndex={-1} />
                 <h3 className="text-xl font-semibold mb-1">Solicita tu servicio</h3>
                 <p className="text-sm text-muted-foreground mb-3">Este formulario se enviará al equipo de LogroVTC. Nos pondremos en contacto contigo lo antes posible para confirmar los detalles de tu traslado.</p>
                 <div className="grid md:grid-cols-2 gap-3">
@@ -107,7 +111,7 @@ export default function HomePage() {
               { title: "Pago con tarjeta", desc: "Aceptamos tarjetas y pagos digitales. Factura para empresa." },
               { title: "Cobertura regional, nacional e internacional", desc: "Servicios a cualquier punto de España y rutas internacionales." },
               { title: "Conductores experimentados", desc: "Profesionales locales con atención cercana y puntualidad." },
-              { title: "Hasta 7 plazas", desc: "Flota amplia: turismos y furgonetas confort hasta 7 pasajeros." }
+              { title: "Vehículos eléctricos", desc: "Disponemos de coches eléctricos para un traslado más sostenible." },
             ].map((item, i) => (
               <Reveal key={i} delay={i * 80}>
                 <Card className="border-border/80 bg-gradient-to-b from-card to-card/60 p-0">
@@ -257,7 +261,7 @@ export default function HomePage() {
                 {/* Botones estandarizados */}
                 <div className="flex gap-3">
                   <Button asChild className="flex-1">
-                    <a href="tel:630926611">Llamar ahora</a>
+                    <a href="tel:722109111">Llamar ahora</a>
                   </Button>
                   <Button variant="outline" className="flex-1" onClick={() => openModal("aeropuerto")}>
                     Pedir presupuesto
@@ -287,7 +291,7 @@ export default function HomePage() {
               </div>
               <div className="mt-6 flex gap-3">
                 <Button asChild className="flex-1">
-                  <a href="tel:630926611">Llamar ahora</a>
+                  <a href="tel:722109111">Llamar ahora</a>
                 </Button>
                 <Button variant="outline" className="flex-1" onClick={() => openModal("camino")}>
                   Pedir presupuesto
@@ -347,7 +351,7 @@ export default function HomePage() {
               </div>
               <div className="mt-6 flex gap-3">
                 <Button asChild className="flex-1">
-                  <a href="tel:630926611">Llamar ahora</a>
+                  <a href="tel:722109111">Llamar ahora</a>
                 </Button>
                 <Button variant="outline" className="flex-1" onClick={() => openModal("mensajeria")}>
                   Pedir presupuesto
@@ -397,7 +401,7 @@ export default function HomePage() {
               </div>
               <div className="mt-4 md:mt-0 flex gap-3">
                 <Button asChild size="lg" className="flex-1">
-                  <a href="tel:630926611">Llamar ahora</a>
+                  <a href="tel:722109111">Llamar ahora</a>
                 </Button>
                 <Button variant="outline" size="lg" className="flex-1" onClick={openGenericModal}>
                   Solicitar presupuesto <Mail size={16} />

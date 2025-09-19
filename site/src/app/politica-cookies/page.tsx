@@ -280,7 +280,7 @@ export default function PoliticaCookiesPage() {
                 <div className="grid gap-3 md:grid-cols-2">
                   <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-primary" />
-                    <span>630 92 66 11</span>
+                    <span>722 10 91 11</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-primary" />

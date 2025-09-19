@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     if (st) {
       const title = `${st.name} | Traslados VTC | LogroVTC`;
       const description = st.description;
-      const url = `https://logro-vtc.vercel.app/estaciones/${slug}`;
+      const url = `https://logrovtc.com/mail/estaciones/${slug}`;
       return {
         title,
         description,
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!station) return {};
   const title = `${station.name} | Traslados VTC | LogroVTC`;
   const description = station.description;
-  const url = `https://logro-vtc.vercel.app/estaciones/${station.slug}`;
+  const url = `https://logrovtc.com/mail/estaciones/${station.slug}`;
   return {
     title,
     description,
@@ -94,8 +94,8 @@ export default async function StationPage({ params }: PageProps) {
     provider: {
       "@type": "LocalBusiness",
       name: "LogroVTC",
-      telephone: "+34630926611",
-      url: `https://logro-vtc.vercel.app/estaciones/${station.slug}`,
+      telephone: "+34722109111",
+      url: `https://logrovtc.com/mail/estaciones/${station.slug}`,
       areaServed: ["La Rioja", "España"],
     },
   } as const;
@@ -114,9 +114,9 @@ export default async function StationPage({ params }: PageProps) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Inicio", item: "https://logro-vtc.vercel.app/" },
-      { "@type": "ListItem", position: 2, name: "Estaciones", item: "https://logro-vtc.vercel.app/estaciones" },
-      { "@type": "ListItem", position: 3, name: station.name, item: `https://logro-vtc.vercel.app/estaciones/${station.slug}` },
+      { "@type": "ListItem", position: 1, name: "Inicio", item: "https://logrovtc.com/mail/" },
+      { "@type": "ListItem", position: 2, name: "Estaciones", item: "https://logrovtc.com/mail/estaciones" },
+      { "@type": "ListItem", position: 3, name: station.name, item: `https://logrovtc.com/mail/estaciones/${station.slug}` },
     ],
   } as const;
 

@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     if (a) {
       const title = `${a.name} | Traslados VTC | LogroVTC`;
       const description = a.description;
-      const url = `https://logro-vtc.vercel.app/aeropuertos/${slug}`;
+      const url = `https://logrovtc.com/mail/aeropuertos/${slug}`;
       return {
         title,
         description,
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!airport) return {};
   const title = `${airport.name} | Traslados VTC | LogroVTC`;
   const description = airport.description;
-  const url = `https://logro-vtc.vercel.app/aeropuertos/${airport.slug}`;
+  const url = `https://logrovtc.com/mail/aeropuertos/${airport.slug}`;
   return {
     title,
     description,
@@ -94,8 +94,8 @@ export default async function AirportPage({ params }: PageProps) {
     provider: {
       "@type": "LocalBusiness",
       name: "LogroVTC",
-      telephone: "+34630926611",
-      url: `https://logro-vtc.vercel.app/aeropuertos/${airport.slug}`,
+      telephone: "+34722109111",
+      url: `https://logrovtc.com/mail/aeropuertos/${airport.slug}`,
       areaServed: ["La Rioja", "España"],
     },
     hasOfferCatalog: undefined,
@@ -115,9 +115,9 @@ export default async function AirportPage({ params }: PageProps) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Inicio", item: "https://logro-vtc.vercel.app/" },
-      { "@type": "ListItem", position: 2, name: "Aeropuertos", item: "https://logro-vtc.vercel.app/aeropuertos" },
-      { "@type": "ListItem", position: 3, name: airport.name, item: `https://logro-vtc.vercel.app/aeropuertos/${airport.slug}` },
+      { "@type": "ListItem", position: 1, name: "Inicio", item: "https://logrovtc.com/mail/" },
+      { "@type": "ListItem", position: 2, name: "Aeropuertos", item: "https://logrovtc.com/mail/aeropuertos" },
+      { "@type": "ListItem", position: 3, name: airport.name, item: `https://logrovtc.com/mail/aeropuertos/${airport.slug}` },
     ],
   } as const;
 

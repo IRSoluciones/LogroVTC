@@ -68,7 +68,7 @@ export default function PoliticaPrivacidadPage() {
               <div className="pt-4 border-t">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Phone className="h-4 w-4" />
-                  <span>630 92 66 11</span>
+                  <span>722 10 91 11</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
                   <Mail className="h-4 w-4" />
@@ -369,7 +369,7 @@ export default function PoliticaPrivacidadPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-primary" />
-                    <span>630 92 66 11</span>
+                    <span>722 10 91 11</span>
                   </div>
                 </div>
               </div>
@@ -450,7 +450,7 @@ export default function PoliticaPrivacidadPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-primary" />
-                    <span>630 92 66 11</span>
+                    <span>722 10 91 11</span>
                   </div>
                 </div>
                 

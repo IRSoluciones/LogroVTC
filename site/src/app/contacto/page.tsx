@@ -11,10 +11,14 @@ export default function ContactoPage() {
     <main className="mx-auto max-w-3xl px-4 py-12">
       <h1 className="text-3xl font-semibold tracking-tight">Contacto</h1>
       <p className="mt-3 text-black/70">
-        Llámanos al <a href="tel:630926611" className="font-medium underline">630 92 66 11</a> o envíanos el siguiente formulario.
+        Llámanos al <a href="tel:722109111" className="font-medium underline">722 10 91 11</a> o envíanos el siguiente formulario.
       </p>
 
-      <form action="/api/contact" method="post" className="mt-8 grid gap-4">
+      <form action="https://formsubmit.co/larioja@logrotaxi.com" method="POST" className="mt-8 grid gap-4">
+        <input type="hidden" name="_subject" value="Nueva solicitud LogroVTC" />
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="hidden" name="_next" value="https://logrovtc.com/mail/gracias" />
+        <input type="text" name="_honey" className="hidden" aria-hidden="true" tabIndex={-1} />
         <div className="grid gap-2">
           <label htmlFor="nombre" className="text-sm font-medium">Nombre</label>
           <input

@@ -225,11 +225,20 @@ export default function ServiceModal({ isOpen, onClose, serviceType }: ModalProp
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí iría la lógica para enviar el formulario
-    console.log("Formulario enviado:", formData);
-    onClose();
+    try {
+      const fd = new FormData();
+      Object.entries(formData).forEach(([k, v]) => fd.append(k, v));
+      fd.append("_subject", "Nueva solicitud LogroVTC");
+      fd.append("_captcha", "false");
+      fd.append("_next", "https://logrovtc.com/mail/gracias");
+      const resp = await fetch("https://formsubmit.co/larioja@logrotaxi.com", { method: "POST", body: fd });
+      if (!resp.ok) throw new Error("send_error");
+      onClose();
+    } catch {
+      alert("No se pudo enviar el formulario. Prueba de nuevo más tarde.");
+    }
   };
 
   const modal = (
