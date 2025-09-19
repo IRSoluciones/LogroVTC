@@ -93,6 +93,7 @@ export default function RootLayout({
               <Link href="/#aeropuerto" className="hover:underline">Aeropuertos</Link>
               <Link href="/#camino" className="hover:underline">Camino de Santiago</Link>
               <Link href="/#mensajeria" className="hover:underline">Mensajería</Link>
+              <Link href="/localidades" className="hover:underline">Localidades</Link>
             </nav>
             <a
               href="tel:722109111"
